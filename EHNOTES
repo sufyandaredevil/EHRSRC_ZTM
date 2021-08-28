@@ -18,3 +18,48 @@ FOR MORE: https://securitytrails.com/blog/osint-tools
 
 
 
+____________________________________________________________________
+SCANNING
+____________________________________________________________________
+top 10 vulnerable machines
+https://www.rapid7.com/blog/post/2011/12/23/where-can-i-find-vulnerable-machines-for-my-penetration-testing-lab/
+
+metasploitable(downloaded)
+
+arp (show a list of all hosts connected to your related network [only shows infos those are already pinged])
+
+netdiscover (finds all of the available hosts available on a network by broadcasting arps [better than arp])
+
+netstat -nr (show network routing table with numeric values)
+
+nmap-------------------------------------------------------------------------------------------------------------------------------------------------
+|  NMAP SCAN TYPES
+|  nmap (normally it scans famous 1000 ports but being explicit, also scans others)
+|  nmap -sS <ip_addr> (TCP SYN scan)
+|  nmap -sT <ip_addr> (TCP connect scan)
+|  nmap -sU <ip_addr> (UDP scan)
+|  nmap -O <ip_addr> (OS Fingerprinting)
+|  nmap -sV <ip_addr> (Version of services running in target machine)
+|  nmap -sV --version-intensity [1-9] <ip_addr> (same as above with specified intensity[default intensity - 7, i.e default for above cmd])
+|  nmap -A <ip>  (alternative to -O,-sV,nmap script scanning and as the flag suggests, scans aggressively)
+|  nmap -sn <ip/ip-range> (no port scan [similar to netdiscover cmd])
+|  
+|  NMAP PORT & SPECS
+|  nmap -p [<port_number>] [<p1>,<p2>,...,<pn>] [plow-phigh] <ip_addr> (scan for specific port numbers)
+|  nmap -p- <ip_addr> (scan all ports)
+|  nmap -F <ip_addr> (scan top 100 ports that are used mostly)
+|  nmap -oN <output_filename> <other flag_misc> (stdo to file and console)
+|  
+|  NMAP EVADE FW & IDS
+|  nmap -f <ip_addr> (fragment ip packet into several parts while pinging) [on adding another -f, 8 fragments add up to divide packet again by +8 i.e. 16 fragments but on real some program can't handle these types of tiny packets]
+|  nmap --mtu <multiple of 8> <ip_addr> (above's multiple -f flags alternative)
+|  nmap -D RND:<number of decoys> <ip_addr> (send n  number of packets as if even different ip addressed computers along with u tried to send packets just to make IDS confused)
+|  nmap -D <random_private_ip1,ip2,...,ME <target_ip> (here ME is your local IP)
+|  NOTE: above 1st decoy cmd works best for targets that are on another network, 2nd decoy cmd are for targets within the same network. [for behind the scenes use wireshark to know random ip_addrs used]
+
+TIP: Zenmap for GUI XP of nmap
+NOTE: to view progress & ETA for longer scan, press UP arrow
+FOR MORE: https://nmap.org/book/man.html
+
+
+
