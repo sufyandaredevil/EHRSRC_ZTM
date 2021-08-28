@@ -150,3 +150,12 @@ MSFCONSOLE OTHER MISC:
 to search a specific software service:
 > search <software_name> (basically the software_name is found out from the nmap service scan without the version of the software itself)
 
+[VIDEO (vsftpd - FIRST VULNERABILITY EXPLOITATION)]:
+	start scanning metasploitable VM using nmap (-sV) and 
+	then use searchsploit to search for the service /w version whether we have an exploit for that and check whether metasploit version of exploit is available
+	if its available goto metasploit and do "search <software_name>" and select the matching version with "use <exploit_loc>" and the above following steps as done
+Eg: Exploiting vsftpd 2.3.4
+> use exploit/unix/ftp/vsftpd_234_backdoor
+> set <params> <param_value>
+> exploit
+
