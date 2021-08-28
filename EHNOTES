@@ -63,3 +63,27 @@ FOR MORE: https://nmap.org/book/man.html
 
 
 
+VULNERABILITY ANALYSIS
+____________________________________________________________________
+before analyzing, try not to reinvent the wheel cause there might be exploits found for a specific service already!
+
+(NMAP) nmap scripts location: usr/share/nmap/scripts
+To run a script: nmap --script [<script_category>|<specific_script>] <target> <scan-type>
+<script_category> = firewall | exploit | banner | malware | auth ->>AND MORE....
+FOR MORE: https://nmap.org/book/nse-usage.html
+Description about the script: nmap --script-help <script_name.nse>
+
+searchsploit(kali linux) in cmd
+eg: searchsploit <servicename_/w_version(as present in nmap -sV result)>
+after searching, result shows 2 columns(exploit title, path)
+in path it shows partial path to the exploit script eg: linux/remote/16922.rb
+so copy the exploit filename and search for the file using locate cmd,
+i.e.> locate 16922.rb (exploits are by default present in kali linux and not in other linux distros)
+then run the script wrt the extension of the script
+
+nessus : https://www.tenable.com/downloads/nessus
+to install : sudo dpkg -i <nessus_filename>
+logon to: https://kali:8834/ (port number might vary, but when starting the nessus service try to check the printed description while switching it on)
+
+
+
