@@ -185,3 +185,21 @@ in result check for the keyword 'username' in description column and note its pa
 > use exploit/multi/samba/usermap_script' (here multi/ says that this exploit works for different OS)
 again we set options(RHOSTS) and run it using 'exploit' cmd to gain root access 
 
+[VIDEO (SSH Exploitation - here we brute force usernames(n), passwords(m)[nxm combinations] to check whether weak passwords are set)]
+here we use one of the auxiliary module to brute login to SSH so we search:
+> search auxiliary scanner ssh
+from the result we search for a script description: 'SSH Login Check Scanner'.This script allows us to bruteforce SSH target so we use it as follows:
+> use auxiliary/scanner/ssh/ssh_login
+Now in options we set RHOSTS and 2 other main params (USER_FILE,PASS_FILE).
+as we're bruteforcing the SSH those are mandatory so for both the USER_FILE, PASS_FILE we enter the location of a .txt file that contains usernames and passwords 1/line
+so we enter the absolute path of those txt files for both those brute params as follows:
+> set USER_FILE /home/$(whoami)/Desktop/usernames.txt
+> set PASS_FILE /home/$(whoami)/Desktop/passwords.txt
+now we can run 'exploit' or even set another option called 'VERBOSE' to true to get detailed info about the brute process
+Now you might use the shell to execute commands in the target's machine so in msfc using a cmd called:
+> sessions (displays all the sessions compromised in target's system so far)
+from that we can note the Id of the session from the Id column and use the following cmd to start interacting with the target machine:
+> sessions -i <Id>
+since we got the uername, password of the SSH we can use the normal of accessing it as follows:
+> ssh <username>@<ip_addr> (after initalization, asks for password )
+eg: ssh msfadmin@192.168.1.98
