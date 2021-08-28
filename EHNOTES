@@ -168,3 +168,20 @@ eg: to connect to a service: nc <ip_addr> <port_number>
 to access telnet in cmd:
 > telnet <ip_addr>
 
+[VIDEO (Samba Exploitation - here we tend to find out the exact version of samba before exploiting)]
+after scanning in nmap (-sV) we tend to find out the partial version of samba service but 
+we to find the exact version we use msfconsole and in it using the auxiliary module we have a submodule called scanner and within it we have specifics to smb(samba).
+so using autocomplete feature we can enter the foll. cmd:
+> use auxiliary/scanner/smb/[PRESS_TAB] (here [PRESS_TAB] literally means pressing the tab button in your keyboard to view all possibilities)
+the rest shows available scanner scripts and from that we select the following:
+> use auxiliary/scanner/smb/smb_version (since we wanna scan the version of smb we select it)
+after selecting the auxiliary, we setup the necessary options(such as RHOSTS) and then enter 'run'
+Now after finding the exact version of smb we search for an exploit for that particular version using:
+> searchsploit Samba 3.0.20
+we get a metasploit module from the search result. i.e: 'Username' map script' Command Execution 
+so to search and use that script in msfconsole we enter:
+> search exploit samba
+in result check for the keyword 'username' in description column and note its particular name which is the following and to use it:
+> use exploit/multi/samba/usermap_script' (here multi/ says that this exploit works for different OS)
+again we set options(RHOSTS) and run it using 'exploit' cmd to gain root access 
+
