@@ -63,6 +63,7 @@ FOR MORE: https://nmap.org/book/man.html
 
 
 
+____________________________________________________________________
 VULNERABILITY ANALYSIS
 ____________________________________________________________________
 before analyzing, try not to reinvent the wheel cause there might be exploits found for a specific service already!
@@ -86,4 +87,66 @@ to install : sudo dpkg -i <nessus_filename>
 logon to: https://kali:8834/ (port number might vary, but when starting the nessus service try to check the printed description while switching it on)
 
 
+
+____________________________________________________________________
+EXPLOITATION & GAINING ACCESS 
+____________________________________________________________________
+
+FEW IMPORTANT TERMINOLOGIES AND DEFS:
+	PAYLOAD : payload is the part of the private user text which could also contain malware such as worms or viruses which performs the malicious action
+	EXPLOIT: piece of software, a chunk of data, or a sequence of commands that takes advantage of a bug or vulnerability
+		TIP: the best analogy to understand the difference bet. exploit & payload is that an exploit is the way to create a pipeline and the payload is the script that's used to perform all sorts of stuffs in the target system using that pipeline
+	BIND SHELL : have the listener(basically it means opening a port so that a service runs in that port) running on the target and the attacker connect to the listener in order to gain a remote shell.(due to firewall, port opening restrictions might be present in target system, creating a bind shell might not work in some cases)
+	REVERSE SHELL : have the listener running on the attacker and the target connects to the attacker with a shell.(the target tries to connect to the attacker's specific open port)
+
+(msfconsole)metasploit-framework-------------------------------------------------------------------------------------------------------------------------------------------------
+location in kali linux: /usr/share/metasploit-framework/
+some important files defs inside the above folder as follows:
+	msfconsole - to open the metasploit-framework in cmd
+	msfvenom - tool to generate payload/shell
+	modules/ - folder consisting of all frameworks in metasploit
+		exploits/ - program execute set of command in target machine to gain access like Buffer overflow, RCE etc
+		auxiliary/ - not a payload but performs actions like scanning(such as version, eg: bruteforce login panels for ssh), fuzzing, DOS attacks etc(sometimes used in first 2 stages of penetration testing)
+		post/ - as the name suggests post exploitation module that's usually used after successfully gaining access to the target device and get info such as files, hashes etc
+		payloads/ - some code that's delivered to target to exploit the target machine
+			singles/ - payloads that are standalone, eg: adding a user to the target system etc
+			stagers/ - setup a network connection between attacker and target system and designed to be small & reliable and done by shells(reverse, bind)[tcp & udp]
+			stages/ - payload components that are downloaded by stagers modules, can provide adv. feats. /w no size limits
+		encoders/ - helps evading anti virus detection(normally for us a payload's a script but for targets its a virus so this help to encode and make payloads less detectable by the antivirus)
+		evasion/ - pretty much the same as encoders/
+		nops/ - (no operation) instruction for the processor which means do nothing(useful to execute buffer overflow attacks) 
+
+TIP: (in msfconsole, we can also run normal linux cmds such as: ifconfig, ls, cd within without the help of opening another terminal)
+
+MSFCONSOLE BASIC CMDS, MODULE SELECTION AND AHEAD:(TO REM: the thing we do everytime in mfsc is use a module/ by selecting an exploit, then set options for the module/, the payload and the target and finally exploit!)
+> help (for help manual)
+> show payloads (list all available payloads present in /usr/share/metasploit-framework/ which shows columns such as number, name etc
+> show exploits (same as above but shows all exploits)
+> sessions (shows sessions that are initialized with target's machine)
+> use <name_from_the_show_list> (to use an exploit. Eg: use exploit/windows/smb/ms06_040_netapi)
+after the above module is selected to view all info/description about it:
+> show info (to view the code we can get to the msf location[/usr/share/metasploit-framework/] and get to the relative modules folder)
+we need to setup options for the module that we're gonna use, so the following cmd shows what all options are available to configure the specific module you've chosen
+> show options
+basically it shows 3 different options:
+	module options: options to setup the target's info such as ip_addr, port (RHOSTS,RPORT) etc
+	payload options: options to setup the attacker's system such as when creating a rev_tcp_shell we need to give attacker's ip, port (LHOST,LPORT) etc(basically it is setup already for us by msf itself)
+	exploit targets: shows all the vulnerable targets available predefined for the particular module/ selected(it could be a software or for a specific OS that's running in the target system) Eg: list of specific exploits for win10, win7 etc or in case a software it is by default no specialization takes place 
+to set an option the following cmd is used:
+> set <option_name> <value/s> (eg: set LHOST 192.168.1.15)
+we can again use "show options" to see if the value changed is set
+
+we can also change the payload but usually what msf gave as its best but sometimes it might not work.
+but still we can change the payload for a specifically selected module/ by listing the payloads using "show payloads" but this time only the possible payloads will be listed for that specific module/
+after that we can copy the name of the payload and type the foll. cmd:
+> set payload <payload_name> (make sure while setting a rev. or bind shell while setting the payload option,change respective ip_addr, ports (RHOST, LHOST, LPORT, RPORT) needs to be changed)
+to list all targets we can use "show targets" and to set use the foll. cmd:
+> set target <id_number>
+if no specific target info is known an "Automatic" option would be present in targets but only scopes within the known targets and not others. Eg: if targets are present for win10,win7, Automatic doesn't work out for winXP
+and finally to execute the setup we've did so far the foll. cmd is used:
+> exploit
+
+MSFCONSOLE OTHER MISC:
+to search a specific software service:
+> search <software_name> (basically the software_name is found out from the nmap service scan without the version of the software itself)
 
