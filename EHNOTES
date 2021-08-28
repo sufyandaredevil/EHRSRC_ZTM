@@ -159,3 +159,8 @@ Eg: Exploiting vsftpd 2.3.4
 > set <params> <param_value>
 > exploit
 
+[VIDEO (BindShell Misconfiguration - basically a metasploitable shell that's opened without any username or password unconfigured)]
+NC(Netcat):
+> nc -h (help menu)[pretty much the whole help page is self explanatory]
+eg: to connect to a service: nc <ip_addr> <port_number>
+
