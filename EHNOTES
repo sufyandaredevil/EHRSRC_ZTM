@@ -164,3 +164,7 @@ NC(Netcat):
 > nc -h (help menu)[pretty much the whole help page is self explanatory]
 eg: to connect to a service: nc <ip_addr> <port_number>
 
+[VIDEO (Telnet Exploitation - similar to above but with default username & password that's not changed)]
+to access telnet in cmd:
+> telnet <ip_addr>
+
