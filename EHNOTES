@@ -1,0 +1,20 @@
+KALIVM USERNAME:PASSWORD - mrh:2195
+
+____________________________________________________________________
+INFO GATHERING
+____________________________________________________________________
+ping
+nslookup
+ipinfo.info
+whois
+whatweb
+theHarvester - removed from kali linux since it had problems, so cloned from github
+hunter.io
+redhawk(github)
+sherlock(github)
+email-scraper.py(course resource - present in EHRSRC)
+INFO: search for new information gathering tools in online repos(eg: github) if something doesn't work that's present in kalilinux
+FOR MORE: https://securitytrails.com/blog/osint-tools
+
+
+
