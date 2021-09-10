@@ -31,8 +31,7 @@ try:
         except (requests.exceptions.MissingSchema, requests.exceptions.ConnectionError):
             continue
 
-        new_emails = set(re.findall(
-            r"[a-z0-9\.\-+_]+@[a-z0-9\.\-+_]+\.[a-z]+", response.text, re.I))
+        new_emails = set(re.findall(r"[a-z0-9\.\-+_]+@[a-z0-9\.\-+_]+\.[a-z]+", response.text, re.I))
         emails.update(new_emails)
 
         soup = BeautifulSoup(response.text, features="lxml")
