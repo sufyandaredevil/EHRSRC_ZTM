@@ -857,3 +857,52 @@ now we need to setup a local listener where the ngrok server port forwards the r
 > set LHOST 0.0.0.0 (0.0.0.0 means listen on any interface whatsoever)
 > set LPORT 5555
 > run
+
+
+____________________________________________________________________
+ANONYMITY MISC
+____________________________________________________________________
+
+TOR:
+        to install and open tor browser:
+        > sudo apt-get install tor torbrowser-launcher
+        > torbrowser-launcher
+        to check whether we're the browser is configured to use tor:
+        log onto: https://check.torproject.org (also use any ip checking website to see if any change in public ip)
+        Alternative to TOR:
+        Brave browser has additional chromium features and much more
+
+ANONYMITY ON USING ANY INTERNET BASED APP(i.e. firefox, nmap etc) USING PROXYCHAINS:
+        install and start the tor service:
+        > sudo apt-get install tor
+        > service start tor
+        to check tor's status
+        > service tor status 
+
+        install proxychains:
+        > sudo apt-get install proxychains
+
+        to configure the proxychains open: /etc/proxychains.conf
+        and edit the file as follows:
+        --> comment out strict_chain and uncomment dynamic_chain
+        --> at the EOF add a new line with:
+        socks5 127.0.0.1  9050
+
+        to open an application with proxychains:
+        > proxychains nmap <domainame/ip> -A
+        > proxychains firefox
+
+ANONYMITY USING OPENVPN:
+        install openvpn:
+        > sudo apt-get install openvpn
+
+        log onto: https://www.vpnbook.com
+        goto OPENVPN tab in webpage and click any preferred server, download the zip and unzip it and make note of the username and password in the same tab given at the bottom
+        click on VPN Connections > Add a VPN connection that is seen after clicking the internet icon at the top right corner (kalinux)
+        select "Import a saved VPN configuration" from the dropdown menu and select the file that is of the following form --> vpnbook-<country><number>-tcp80.ovpn
+        now a config tab opens up asking username, password. Paste the one we copied from vpnbook then click save.
+        Go back to the internet icon and check VPN Connections > vpnbook-<country><number>-tcp80
+        Now to check whether the vpn connection is established use > ifconfig to see whether any new network interface like tun<number> is attached (Also a popup msg comes when the connection is established)
+
+OTHER FAMOUS OPENSOURCE ANONIMITY TOOLS:
+        kali-whoami: https://github.com/omer-dogan/kali-whoami
