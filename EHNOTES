@@ -758,7 +758,7 @@ first set attacker's wifi card to monitor mode like we did in the previous secti
 then using airmon-ng we can check whether what all services might cause trouble with our wifi cracking as follows:
 > airmon-ng check <wireless_interface_name>
 if case we get any process, to kill them:
-> airmon-ng check kill 
+> airmon-ng check kill <PID>
 after killing make sure whether we've gone again to the managed mode by using '> iwconfig' and if yes then rerun the previous section's commands 
 we can also set to monitor mode using airmon-ng as follows:
 > airmon-ng start <wireless_interface_name> (this adds a suffix to the <wireless_interface_name> as <wireless_interface_name>mon )
