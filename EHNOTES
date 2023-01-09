@@ -904,3 +904,32 @@ ANONYMITY USING OPENVPN:
 
 OTHER FAMOUS OPENSOURCE ANONIMITY TOOLS:
         kali-whoami: https://github.com/omer-dogan/kali-whoami
+
+USB CAPTURE USING WIRESHARK SETUP:
+        1. Add yourself to the wireshark group then relogin:
+        > sudo adduser $USER wireshark
+
+        2. To dump USB traffic on Linux, you need the usbmon kernel module. If it is not loaded yet, run:
+        > modprobe usbmon
+
+        3. Give regular users privileges, make the usbmonX device(s) readable:
+        > sudo setfacl -m u:$USER:r /dev/usbmon*
+
+        4. Create /etc/udev/rules.d/99-usbmon.rules and add:
+        # Allows members of the wireshark group to access the usbmon device
+        SUBSYSTEM=="usbmon", GROUP="wireshark", MODE="0640"
+
+        5. sudo udevadm control --reload-rules && sudo udevadm trigger
+
+        6. After this we can "ls -l /dev/usbmon* to see that all the usbmon* belong to the 'wireshark' group 
+
+        7. run 'lsusb' to see all the usbs connected the the computer
+
+        8. Now to second column that lists numbers (bus_id) and fourth column that lists device_address can be used to identify a specific usb that is connected to the computer which can later be used to identify the same in the wireshark start screen capture window that looks similar to this: usbmonN (where n is the bus_id)
+
+        9. Load usbmon and start wireshark using:
+        > sudo modprobe usbmon
+        > wireshark
+
+        10. During capturing we can use filters such as:
+        > usb.bus_id==N && usb.device_address==N1 && usb.capdata
