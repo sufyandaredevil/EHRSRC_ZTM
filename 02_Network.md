@@ -1,7 +1,7 @@
 **Instructor: Dimitris Amprazis**
 
 #### Types of Attacks:
-1. [ARP Cache Poisoning / Spoofing](#arp-cache-poisoning--poisoning-w-metasploit)
+1. [ARP Cache Poisoning / Spoofing](#arp-cache-poisoning--spoofing-w-metasploit)
 1. [SMURF Attack / ICMP Flooding](#hping-commands)
 1. [Denial of Service / DoS Attack](#hydra-command)
 1. [Christmas Tree Attack](#hping-commands)
@@ -18,6 +18,7 @@
 - Boolean filter: `http||arp`
 - Boolean & Comparison filter combination: `http&&ip.src==95.100.242.40`
 - Filter lost TCP Segment filter: `tcp.analysis.lost_segment`
+- Filter TCP latency above n second: `tcp.time_delta > n`
 - Filter Retransmitted TCP Segment: `tcp.analysis.retransmission`
 - Filter a frame that contains a specific text: `frame contains username123`
 - Show suspicious traffic (if any): `Analyze > Expert Information > Severity:Warning`
