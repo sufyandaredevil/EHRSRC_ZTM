@@ -1,3 +1,2 @@
 
-NOTE: persistency is set at win7x64(vm) that connects to port 4444(attacker's pc(KALINUX))
-check whether we can use msfv payload and get it connected with nc(rev_shell)
+NOTE: check whether we can use msfv payload and get it connected with nc(rev_shell)

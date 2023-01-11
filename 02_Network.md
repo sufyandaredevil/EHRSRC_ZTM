@@ -57,48 +57,6 @@
 
 ---
 
-#### Nmap Utils:
-  - **-A** - OS Detection, service detection, script scanning
-  - **-Pn** - Treat all hosts as online and skip host discovery. If the target blocks ICMP requests, this will result in Nmap assuming that the host is down.
-  - **-T4** - set the speed of the scan(valid params: 0 - 5)
-  - **-p1-65535** - set port scan range(-p- is an alternative to scan all ports)
-
----
-
-#### Nmap Port Scanning:
-
-- **TCP Scan**: `nmap -sT -p445 192.168.8.123`
-  > **Port Opened**: (src)`SYN`, (dst)`SYN, ACK`, (src)`ACK`, (src)`RST`
-  > 
-  > **Port Closed**: (src)`SYN`, (dst)`RST, ACK`
-
-- **SYN Scan**: `nmap -sS -p445 192.168.8.123`
-  > **Port Opened**: (src)`SYN`, (dst)`SYN, ACK`, (src)`RST`
-  > 
-  > **Port Closed**: (src)`SYN`, (dst)`RST, ACK`
-
-- **FIN Scan**: `nmap -sF -p445 192.168.8.123`
-  > **Port Opened**: (src)`FIN`
-  > 
-  > **Port Closed**: (src)`SYN`, (dst)`RST, ACK`
-
-- **NULL Scan**: `nmap -sN -p445 192.168.8.123`
-  > **Port Opened**: (src)`<None>`
-  > 
-  > **Port Closed**: (src)`<None>`, (dst)`RST, ACK`
-
-- **XMAS Scan**: `nmap -sX -p445 192.168.8.123`
-  > **Port Opened | Filtered**: (src)`FIN, PSH, URG`
-  > 
-  > **Port Closed**: (src)`FIN, PSH, URG`, (dst)`RST, ACK`
-
-- **UDP Scan**: `nmap -sU -p161 192.168.8.123`
-  > **Port Opened | Filtered**: (src)`<Datagram>`
-  > 
-  > **Port Closed**: (src)`<Datagram>`, (dst)`Dst/Port unreachable`
-
----
-
 #### ICMP / Ping / Host Discovery Utils:
 
   > **NOTE**:
