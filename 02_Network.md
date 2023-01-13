@@ -9,6 +9,8 @@
 1. [MAC Flooding](#macof-commands)
 1. [SSL Stripping](#ssl-stripping)
 
+---
+
 #### Wireshark Utils:
 - Comparison: 
     - source ip filter: `ip.src==216.58.198.14`
@@ -57,6 +59,12 @@
 
 ---
 
+#### Network Utilities:
+- `netstat` - Print network connections, routing tables, interface stats, masquerade connections, multicast memberships
+- `ss` - utility to investigate sockets
+
+---
+
 #### ICMP / Ping / Host Discovery Utils:
 
   > **NOTE**:
@@ -71,6 +79,8 @@
     > **Ping n number of packets** - `ping -n 8 192.168.1.2`
     >
     > **Fragment Ping packet** - `ping -l 33 192.168.1.2`
+    >
+    > **Netdiscover Ping Scan** - `netdiscover [-i <interface> [-r <ip_range>]]`
 
   - **ICMP Codes**:
 
