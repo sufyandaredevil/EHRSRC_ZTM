@@ -13,7 +13,7 @@ Notes created use the following notations that have their own meaning and the pu
   >
   > <u>EXAMPLE 1</u>: `<victim's_ip>` can be `10.0.0.2` or `44.228.249.3`
   >
-  > <u>EXAMPLE 2</u>: **<interface>** can be  **eth0** or **wlan0**
+  > <u>EXAMPLE 2</u>: `<interface>` can be  **eth0** or **wlan0**
 
 - ### [   ]
   > **Square brackets** with strings between it is an **ACTION**.
