@@ -27,7 +27,7 @@ Notes created use the following notations that have their own meaning and the pu
 - ### <kbd>   </kbd>
   > **Markdown Keystroke** with strings between it is a **BUTTON**.
   >
-  > It is to show buttons that needs to be used or **[CLICKED]** in a specific application
+  > It is to show buttons that needs to be **[CLICKED]** in a specific application
   >
   > <u>EXAMPLE 1</u>: <kbd>🌐</kbd> is a **button** that needs to be `[CLICKED]` in the **Ettercap** Application
   >
