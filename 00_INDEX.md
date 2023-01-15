@@ -8,5 +8,5 @@
     - [Network & Web Session Hijacking](/05_SESS_HIJACK.md)
     - [Web Application Pentesting](/06_WEB_PTEST.md)
 
-  - ### EXTRAS:
+  - ### EXTRAS (Not in CodeRed):
     - [SNORT](/OTHER/snort.md)
