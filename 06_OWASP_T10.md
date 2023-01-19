@@ -14,7 +14,7 @@
           email = '${req.body.email}' AND password = '${req.body.password}'`);
       ```
 
-      - Now a **legit request** for `email` and `password` would be something like `admin@123` and `$5up3rPa55&` making the query look like this:
+      - Now a **legit request** for `email` and `password` would be something like `admin@123` and `$5up3rPa55&` making the query in the **server-side** look like this:
         ```js
         query(`SELECT email, password FROM accounts WHERE 
             email = '' AND password = '$5up3rPa55&' `)
@@ -26,7 +26,7 @@
         email = 'admin@123' AND password = '$5up3rPa55&'
         ```
 
-      - But in case of a **malicious request** for `email` and `password` would be something like `' OR '1'='1'--` and `<any_password_text_here>` making the query look like this:
+      - But in case of a **malicious request** for `email` and `password` would be something like `' OR '1'='1'--` and `<any_password_text_here>` making the query in the **server-side** look like this:
         ```js
         query(`SELECT email, password FROM accounts WHERE 
             email = '' OR '1'='1'--' AND password = '1' `)
@@ -43,3 +43,6 @@
     - **Server-side Input Validation**
     - **Escape** special characters using the specific escape syntax for that **interpreter**
     - Use **LIMIT** or other **SQL controls** within queries
+
+- #### **Broken Authentication**
+  > Application functions related to **authentication** and **session management** are often not implemented correctly, allowing attackers to compromise **passwords**, **keys**, or **session tokens**, or to exploit other implementation flaws to assume other users' identities.
