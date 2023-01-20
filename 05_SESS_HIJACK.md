@@ -89,7 +89,7 @@
 
     Then the target machine, so **[SELECT]** the target ip from the Host list and **[CLICK]** <kbd>Add to Target 2</kbd>.
 
-    Finally **[CLICK]** <kbd>🌐</kbd> and check the following params:
+    Finally **[CLICK]** <kbd>🌐</kbd> and check the following param:
       - [x] Sniff remote connections.
       - [ ] Only poison one-way.
     
