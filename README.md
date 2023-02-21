@@ -4,7 +4,7 @@
 This Repository contains notes that are taken from **CodeRed's CEHV12 Custom Bundle Learning Kit** provided by **EC-Council**.
 
 #### Notes Nomenclature:
-Notes created use the following notations that have their own meaning and the purpose is to reduce the amount of information on the notes not reducing in the clarity but also not to digress from the core fact such as PoC screenshots, long paragraphs etc for explaining a concept and prevent overlooking stuffs that are important to remember.
+Notes created use the following notations that have their own meaning and the purpose is to reduce the amount of information on the notes not reducing in the clarity but also not to digress from the core fact by not inserting PoC screenshots, long paragraphs etc for explaining a concept and prevent overlooking stuffs that are important to remember.
 
 - ### <   >
   > **Angular brackets** with strings between it is a **VARIABLE**.
